@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { UserType } from '../users/enums/user.enum';
 import { UserService } from '../users/user.service';
 import { LoginReq, LoginRes } from './dto/login.dto';
@@ -6,7 +7,10 @@ import { RegisterReq, RegisterRes } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   async register(body: RegisterReq): Promise<RegisterRes> {
     const isExists = await this.userService.checkUsernameOrEmailExists(
@@ -34,9 +38,15 @@ export class AuthService {
     if (!user) {
       throw new BadRequestException('Invalid username or password');
     }
+    const token = this.jwtService.sign({
+      userId: user.id,
+      username: user.username,
+      email: user.email,
+      userType: user.userType,
+    });
     return {
       message: 'Login successful',
-      token: '1234567890',
+      token,
     };
   }
 }

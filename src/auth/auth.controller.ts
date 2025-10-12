@@ -21,7 +21,6 @@ export class AuthController {
   @UsePipes(new ZodValidationPipe(LoginReqZodType))
   @Post('login')
   async login(@Body() body: LoginReq): Promise<LoginRes> {
-    console.log(JSON.stringify(body, null, 2));
     return this.authService.login(body);
   }
 }
