@@ -9,4 +9,18 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
   ) {}
+
+  async checkUsernameOrEmailExists(
+    username: string,
+    email: string,
+  ): Promise<boolean> {
+    const user = await this.userRepository.findOne({
+      where: [{ username }, { email }],
+    });
+    return user !== null;
+  }
+
+  async createUser(user: Omit<User, 'id'>): Promise<User> {
+    return this.userRepository.save(user);
+  }
 }
