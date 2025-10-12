@@ -9,7 +9,4 @@ export const RegisterReqZodType = z.object({
 
 export type RegisterReq = z.infer<typeof RegisterReqZodType>;
 
-export type RegisterRes = BaseResponse<never>;
-export class RegisterResDto implements RegisterRes {
-  message: string;
-}
+export type RegisterRes = BaseResponse;
