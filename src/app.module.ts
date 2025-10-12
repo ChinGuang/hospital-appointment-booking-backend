@@ -16,6 +16,7 @@ import { AuthModule } from './auth/auth.module';
       database: 'nestdb',
       entities: [],
       synchronize: true,
+      autoLoadEntities: true,
     }),
     AuthModule,
   ],
