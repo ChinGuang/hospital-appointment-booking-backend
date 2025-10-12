@@ -1,11 +1,11 @@
 import { Body, Controller, Post, UsePipes } from '@nestjs/common';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 import { AuthService } from './auth.service';
-import type { LoginReq, LoginRes } from './dto/login.dto';
+import { LoginReqZodType, type LoginReq, type LoginRes } from './dto/login.dto';
 import {
-  type RegisterReq,
   RegisterReqZodType,
   RegisterRes,
+  type RegisterReq,
 } from './dto/register.dto';
 
 @Controller('auth')
@@ -18,8 +18,10 @@ export class AuthController {
     return this.authService.register(body);
   }
 
+  @UsePipes(new ZodValidationPipe(LoginReqZodType))
   @Post('login')
   async login(@Body() body: LoginReq): Promise<LoginRes> {
+    console.log(JSON.stringify(body, null, 2));
     return this.authService.login(body);
   }
 }

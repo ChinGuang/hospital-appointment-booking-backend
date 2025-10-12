@@ -16,6 +16,7 @@ export class AuthService {
     if (isExists) {
       throw new BadRequestException('Username or email already exists');
     }
+
     await this.userService.createUser({
       ...body,
       userType: UserType.PATIENT,
