@@ -4,9 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import Docker from 'dockerode';
 import * as mysql from 'mysql2/promise';
-import { User } from '../entities/user.entity';
-import { UserService } from '../user.service';
-import { UserType } from './user.enum';
+import { User } from './entities/user.entity';
+import { UserType } from './enums/user.enum';
+import { UserService } from './user.service';
 
 // Helper function to wait for MySQL to be ready
 async function waitForMySQL(maxAttempts = 30, delay = 1000): Promise<void> {
