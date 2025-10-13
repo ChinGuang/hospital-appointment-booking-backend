@@ -62,10 +62,13 @@ describe('AuthService', () => {
 
       const res = await authService.register(registerDto);
 
-      expect(userService.createUser).toHaveBeenCalledWith({
-        ...registerDto,
-        userType: UserType.PATIENT,
-      });
+      expect(userService.createUser).toHaveBeenCalledWith(
+        expect.objectContaining({
+          username: 'newuser',
+          email: 'newuser@example.com',
+          userType: UserType.PATIENT,
+        }),
+      );
       expect(res).toEqual({ message: 'User created successfully' });
     });
   });

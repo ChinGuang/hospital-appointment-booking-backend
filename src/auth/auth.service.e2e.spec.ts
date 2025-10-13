@@ -53,6 +53,20 @@ describe('AuthService (e2e)', () => {
       }
       container = existingContainer;
     } catch {
+      try {
+        // Ensure the image exists (engines don't auto-pull on create)
+        const image = 'mysql:8.0';
+        await new Promise<void>((resolve, reject) => {
+          void docker.pull(image, (err, stream) => {
+            if (err) return reject(new Error(String(err)));
+            docker.modem.followProgress(stream, (err2: Error) =>
+              err2 ? reject(err2) : resolve(),
+            );
+          });
+        });
+      } catch (err) {
+        console.error('Error pulling MySQL image:', err);
+      }
       container = await docker.createContainer({
         Image: 'mysql:8.0',
         name: 'testdb',
