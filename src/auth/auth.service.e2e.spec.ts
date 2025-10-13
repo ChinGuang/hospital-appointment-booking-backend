@@ -5,6 +5,7 @@ import Docker from 'dockerode';
 import * as mysql from 'mysql2/promise';
 
 import { JwtModule } from '@nestjs/jwt';
+import { AuthJwtService } from '../common/services/auth-jwt/auth-jwt.service';
 import { User } from '../users/entities/user.entity';
 import { UserService } from '../users/user.service';
 import { AuthService } from './auth.service';
@@ -105,7 +106,7 @@ describe('AuthService (e2e)', () => {
           signOptions: { expiresIn: '1h' },
         }),
       ],
-      providers: [UserService, AuthService],
+      providers: [UserService, AuthService, AuthJwtService],
     }).compile();
 
     app = moduleFixture.createNestApplication();

@@ -1,6 +1,19 @@
-import { Body, Controller, Post, UsePipes } from '@nestjs/common';
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  UnauthorizedException,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
+import { AuthUserGuard } from '../common/guards/auth-user.guard';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { AuthService } from './auth.service';
+import {
+  AuthenticateResZodType,
+  type AuthenticateRes,
+} from './dto/authenticate.dto';
 import { LoginReqZodType, type LoginReq, type LoginRes } from './dto/login.dto';
 import {
   RegisterReqZodType,
@@ -22,5 +35,16 @@ export class AuthController {
   @Post('login')
   async login(@Body() body: LoginReq): Promise<LoginRes> {
     return this.authService.login(body);
+  }
+
+  @UseGuards(AuthUserGuard)
+  @Post('authenticate')
+  authenticate(@Req() req: { user: unknown }): AuthenticateRes {
+    try {
+      return AuthenticateResZodType.parse(req.user);
+    } catch (error) {
+      console.error('Authentication failed:', error);
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 }
