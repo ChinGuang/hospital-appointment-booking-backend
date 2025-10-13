@@ -218,7 +218,7 @@ describe('AuthService (e2e)', () => {
           username: 'login_user',
           password: 'wrongpass',
         }),
-      ).rejects.toThrow(/Invalid username or password/);
+      ).rejects.toThrow('Invalid password');
     });
 
     it('should throw BadRequestException for nonexistent user', async () => {
@@ -227,7 +227,7 @@ describe('AuthService (e2e)', () => {
           username: 'no_such_user',
           password: 'irrelevant',
         }),
-      ).rejects.toThrow(/Invalid username or password/);
+      ).rejects.toThrow('User not found');
     });
   });
 });

@@ -1,10 +1,11 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserType } from '../users/enums/user.enum';
 import { UserService } from '../users/user.service';
 import { AuthService } from './auth.service';
 import { RegisterReq } from './dto/register.dto';
+import { Argon2Utils } from '../common/utils/argon2';
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -31,6 +32,12 @@ describe('AuthService', () => {
     }).compile();
 
     authService = module.get<AuthService>(AuthService);
+  });
+
+  describe('AuthService defined', () => {
+    it('should be defined', () => {
+      expect(authService).toBeDefined();
+    });
   });
 
   describe('register', () => {
@@ -90,18 +97,29 @@ describe('AuthService', () => {
       userService.getUser!.mockResolvedValue(undefined);
 
       await expect(authService.login(loginReq)).rejects.toThrow(
-        BadRequestException,
+        NotFoundException,
       );
       expect(userService.getUser).toHaveBeenCalledWith(
-        { username: 'testuser', password: 'secret123' },
-        { email: 'testuser', password: 'secret123' },
+        { username: 'testuser' },
+        { email: 'testuser' },
+      );
+    });
+
+    it('should throw BadRequestException if password is invalid', async () => {
+      userService.getUser!.mockResolvedValue(user);
+      // Mock Argon2Utils.verifyPassword to return false
+      jest.spyOn(Argon2Utils, 'verifyPassword').mockResolvedValue(false);
+
+      await expect(authService.login(loginReq)).rejects.toThrow(
+        BadRequestException,
       );
     });
 
     it('should return message and jwt token on successful login', async () => {
       userService.getUser!.mockResolvedValue(user);
       jwtService.sign!.mockReturnValue('mocked.jwt.token');
-
+      // Mock Argon2Utils.verifyPassword to return true
+      jest.spyOn(Argon2Utils, 'verifyPassword').mockResolvedValue(true);
       const result = await authService.login(loginReq);
 
       expect(jwtService.sign).toHaveBeenCalledWith({
