@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindOptionsWhere, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -22,5 +22,9 @@ export class UserService {
 
   async createUser(user: Omit<User, 'id'>): Promise<User> {
     return this.userRepository.save(user);
+  }
+
+  async getUser(...query: FindOptionsWhere<User>[]): Promise<User | null> {
+    return this.userRepository.findOne({ where: query });
   }
 }
