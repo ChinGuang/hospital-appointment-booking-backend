@@ -135,4 +135,24 @@ describe('AuthService', () => {
       });
     });
   });
+
+  describe('refreshToken', () => {
+    it('should return a new token', () => {
+      const userPayload = {
+        userId: 1,
+        username: 'testuser',
+        email: 'testuser@gmail.com',
+        userType: UserType.PATIENT,
+      };
+      authJwtService.sign!.mockReturnValue('new.mocked.jwt.token');
+
+      const result = authService.refreshToken(userPayload);
+
+      expect(authJwtService.sign).toHaveBeenCalledWith(userPayload);
+      expect(result).toEqual({
+        message: 'Token refreshed successfully',
+        token: 'new.mocked.jwt.token',
+      });
+    });
+  });
 });
