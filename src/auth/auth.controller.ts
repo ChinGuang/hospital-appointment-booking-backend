@@ -15,6 +15,7 @@ import {
   type AuthenticateRes,
 } from './dto/authenticate.dto';
 import { LoginReqZodType, type LoginReq, type LoginRes } from './dto/login.dto';
+import type { RefreshTokenRes } from './dto/refresh-token.dto';
 import {
   RegisterReqZodType,
   RegisterRes,
@@ -44,6 +45,18 @@ export class AuthController {
       return AuthenticateResZodType.parse(req.user);
     } catch (error) {
       console.error('Authentication failed:', error);
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
+
+  @UseGuards(AuthUserGuard)
+  @Post('refresh-token')
+  refreshToken(@Req() req: { user: unknown }): RefreshTokenRes {
+    try {
+      const userPayload = AuthenticateResZodType.parse(req.user);
+      return this.authService.refreshToken(userPayload);
+    } catch (error) {
+      console.error('Token refresh failed:', error);
       throw new UnauthorizedException('Invalid token');
     }
   }
