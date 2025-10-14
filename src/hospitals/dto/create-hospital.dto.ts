@@ -18,6 +18,11 @@ export const CreateHospitalReqZodType = z.object({
       emailFrom: z.email().optional(),
     })
     .nullish(),
+  admin: z.object({
+    username: z.string(),
+    email: z.email(),
+    password: z.string(),
+  }),
 });
 
 export type CreateHospitalReq = z.infer<typeof CreateHospitalReqZodType>;

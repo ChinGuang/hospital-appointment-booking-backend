@@ -3,6 +3,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Argon2Utils } from '../common/utils/argon2';
+import { RoleService } from '../role/role.service';
+import { StaffService } from '../staff/staff.service';
+import { UserType } from '../users/enums/user.enum';
+import { UserService } from '../users/user.service';
 import {
   CreateHospitalReq,
   CreateHospitalRes,
@@ -24,6 +29,9 @@ export class HospitalService {
   constructor(
     private readonly hospitalRepoService: HospitalRepoService,
     private readonly hospitalSmtpSettingRepoService: HospitalSmtpSettingRepoService,
+    private readonly userService: UserService,
+    private readonly staffService: StaffService,
+    private readonly roleService: RoleService,
   ) {}
 
   async createHospital(payload: CreateHospitalReq): Promise<CreateHospitalRes> {
@@ -49,6 +57,21 @@ export class HospitalService {
         ...payload.smtpSetting,
       });
     }
+    const hashedPassword = await Argon2Utils.hashPassword(
+      payload.admin.password,
+    );
+    const adminStaff = await this.userService.createUser({
+      username: payload.admin.username,
+      email: payload.admin.email,
+      password: hashedPassword,
+      userType: UserType.STAFF,
+    });
+    const defaultRole = await this.roleService.getDefaultStaffRole();
+    await this.staffService.createStaff({
+      userId: adminStaff.id,
+      hospital,
+      role: defaultRole,
+    });
     return {
       message: 'Hospital created successfully',
       data: {

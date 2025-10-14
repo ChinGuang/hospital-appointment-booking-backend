@@ -10,6 +10,10 @@ export class StaffService {
     private readonly staffRepository: Repository<Staff>,
   ) {}
 
+  async createStaff(payload: Staff): Promise<Staff> {
+    return this.staffRepository.save(payload);
+  }
+
   async getStaffByUserId(userId: number): Promise<Staff | null> {
     return this.staffRepository.findOne({
       where: { userId },

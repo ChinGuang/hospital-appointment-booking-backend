@@ -1,10 +1,10 @@
 import {
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
+    CanActivate,
+    ExecutionContext,
+    ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { PermissionType } from 'src/staff/enums/permission.enum';
+import { PermissionType } from 'src/permissions/enums/permission.enum';
 import { StaffService } from '../../../staff/staff.service';
 import { UserType } from '../../../users/enums/user.enum';
 import { AuthJwtService } from '../../services/auth-jwt/auth-jwt.service';
