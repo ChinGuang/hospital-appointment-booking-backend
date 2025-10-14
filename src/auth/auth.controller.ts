@@ -1,7 +1,21 @@
-import { Body, Controller, Post, UsePipes } from '@nestjs/common';
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  UnauthorizedException,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
+import { AuthUserGuard } from '../common/guards/auth-user.guard';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { AuthService } from './auth.service';
+import {
+  AuthenticateResZodType,
+  type AuthenticateRes,
+} from './dto/authenticate.dto';
 import { LoginReqZodType, type LoginReq, type LoginRes } from './dto/login.dto';
+import type { RefreshTokenRes } from './dto/refresh-token.dto';
 import {
   RegisterReqZodType,
   RegisterRes,
@@ -22,5 +36,28 @@ export class AuthController {
   @Post('login')
   async login(@Body() body: LoginReq): Promise<LoginRes> {
     return this.authService.login(body);
+  }
+
+  @UseGuards(AuthUserGuard)
+  @Post('authenticate')
+  authenticate(@Req() req: { user: unknown }): AuthenticateRes {
+    try {
+      return AuthenticateResZodType.parse(req.user);
+    } catch (error) {
+      console.error('Authentication failed:', error);
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
+
+  @UseGuards(AuthUserGuard)
+  @Post('refresh-token')
+  refreshToken(@Req() req: { user: unknown }): RefreshTokenRes {
+    try {
+      const userPayload = AuthenticateResZodType.parse(req.user);
+      return this.authService.refreshToken(userPayload);
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      throw new UnauthorizedException('Invalid token');
+    }
   }
 }

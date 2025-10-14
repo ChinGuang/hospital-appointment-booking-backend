@@ -3,18 +3,19 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { AuthJwtService } from '../common/services/auth-jwt/auth-jwt.service';
+import { Argon2Utils } from '../common/utils/argon2';
 import { UserType } from '../users/enums/user.enum';
 import { UserService } from '../users/user.service';
 import { LoginReq, LoginRes } from './dto/login.dto';
+import { RefreshTokenRes } from './dto/refresh-token.dto';
 import { RegisterReq, RegisterRes } from './dto/register.dto';
-import { Argon2Utils } from '../common/utils/argon2';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
-    private readonly jwtService: JwtService,
+    private readonly authJwtService: AuthJwtService,
   ) {}
 
   async register(body: RegisterReq): Promise<RegisterRes> {
@@ -52,7 +53,7 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new BadRequestException('Invalid password');
     }
-    const token = this.jwtService.sign({
+    const token = this.authJwtService.sign({
       userId: user.id,
       username: user.username,
       email: user.email,
@@ -60,6 +61,24 @@ export class AuthService {
     });
     return {
       message: 'Login successful',
+      token,
+    };
+  }
+
+  refreshToken(userPayload: {
+    userId: number;
+    username: string;
+    email: string;
+    userType: UserType;
+  }): RefreshTokenRes {
+    const token = this.authJwtService.sign({
+      userId: userPayload.userId,
+      username: userPayload.username,
+      email: userPayload.email,
+      userType: userPayload.userType,
+    });
+    return {
+      message: 'Token refreshed successfully',
       token,
     };
   }

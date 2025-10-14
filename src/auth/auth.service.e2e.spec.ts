@@ -5,7 +5,9 @@ import Docker from 'dockerode';
 import * as mysql from 'mysql2/promise';
 
 import { JwtModule } from '@nestjs/jwt';
+import { AuthJwtService } from '../common/services/auth-jwt/auth-jwt.service';
 import { User } from '../users/entities/user.entity';
+import { UserType } from '../users/enums/user.enum';
 import { UserService } from '../users/user.service';
 import { AuthService } from './auth.service';
 
@@ -105,7 +107,7 @@ describe('AuthService (e2e)', () => {
           signOptions: { expiresIn: '1h' },
         }),
       ],
-      providers: [UserService, AuthService],
+      providers: [UserService, AuthService, AuthJwtService],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -228,6 +230,22 @@ describe('AuthService (e2e)', () => {
           password: 'irrelevant',
         }),
       ).rejects.toThrow('User not found');
+    });
+  });
+
+  describe('refreshToken', () => {
+    const userPayload = {
+      userId: 1,
+      username: 'testuser',
+      email: 'testuser@gmail.com',
+      userType: UserType.PATIENT,
+    };
+    it('should return a new JWT token with valid user payload', () => {
+      const res = authService.refreshToken(userPayload);
+      expect(res).toHaveProperty('message', 'Token refreshed successfully');
+      expect(res).toHaveProperty('token');
+      expect(typeof res.token).toBe('string');
+      expect(res.token.length).toBeGreaterThan(10);
     });
   });
 });

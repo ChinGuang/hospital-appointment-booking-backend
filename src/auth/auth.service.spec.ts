@@ -1,16 +1,16 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
+import { AuthJwtService } from '../common/services/auth-jwt/auth-jwt.service';
+import { Argon2Utils } from '../common/utils/argon2';
 import { UserType } from '../users/enums/user.enum';
 import { UserService } from '../users/user.service';
 import { AuthService } from './auth.service';
 import { RegisterReq } from './dto/register.dto';
-import { Argon2Utils } from '../common/utils/argon2';
 
 describe('AuthService', () => {
   let authService: AuthService;
   let userService: Partial<Record<keyof UserService, jest.Mock>>;
-  let jwtService: Partial<Record<keyof JwtService, jest.Mock>>;
+  let authJwtService: Partial<Record<keyof AuthJwtService, jest.Mock>>;
 
   beforeEach(async () => {
     userService = {
@@ -19,7 +19,7 @@ describe('AuthService', () => {
       getUser: jest.fn(),
     };
 
-    jwtService = {
+    authJwtService = {
       sign: jest.fn(),
     };
 
@@ -27,7 +27,7 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         { provide: UserService, useValue: userService },
-        { provide: JwtService, useValue: jwtService },
+        { provide: AuthJwtService, useValue: authJwtService },
       ],
     }).compile();
 
@@ -117,12 +117,12 @@ describe('AuthService', () => {
 
     it('should return message and jwt token on successful login', async () => {
       userService.getUser!.mockResolvedValue(user);
-      jwtService.sign!.mockReturnValue('mocked.jwt.token');
+      authJwtService.sign!.mockReturnValue('mocked.jwt.token');
       // Mock Argon2Utils.verifyPassword to return true
       jest.spyOn(Argon2Utils, 'verifyPassword').mockResolvedValue(true);
       const result = await authService.login(loginReq);
 
-      expect(jwtService.sign).toHaveBeenCalledWith({
+      expect(authJwtService.sign).toHaveBeenCalledWith({
         userId: user.id,
         username: user.username,
         email: user.email,
@@ -132,6 +132,26 @@ describe('AuthService', () => {
       expect(result).toEqual({
         message: 'Login successful',
         token: 'mocked.jwt.token',
+      });
+    });
+  });
+
+  describe('refreshToken', () => {
+    it('should return a new token', () => {
+      const userPayload = {
+        userId: 1,
+        username: 'testuser',
+        email: 'testuser@gmail.com',
+        userType: UserType.PATIENT,
+      };
+      authJwtService.sign!.mockReturnValue('new.mocked.jwt.token');
+
+      const result = authService.refreshToken(userPayload);
+
+      expect(authJwtService.sign).toHaveBeenCalledWith(userPayload);
+      expect(result).toEqual({
+        message: 'Token refreshed successfully',
+        token: 'new.mocked.jwt.token',
       });
     });
   });
