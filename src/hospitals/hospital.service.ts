@@ -12,6 +12,10 @@ import {
   ReadHospitalsReq,
   ReadHospitalsRes,
 } from './dto/read-hospital.dto';
+import {
+  UpdateHospitalReq,
+  UpdateHospitalRes,
+} from './dto/update-hospital.dto';
 import { HospitalSmtpSettingRepoService } from './repo/hospital-smtp-setting/hospital-smtp-setting-repo.service';
 import { HospitalRepoService } from './repo/hospital/hospital-repo.service';
 
@@ -79,6 +83,17 @@ export class HospitalService {
     return {
       message: 'Hospitals fetched successfully',
       data: hospitals,
+    };
+  }
+
+  async updateHospital(
+    id: number,
+    payload: UpdateHospitalReq,
+  ): Promise<UpdateHospitalRes> {
+    const hospital = await this.hospitalRepoService.updateById(id, payload);
+    return {
+      message: 'Hospital updated successfully',
+      data: hospital,
     };
   }
 }

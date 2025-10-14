@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   UsePipes,
 } from '@nestjs/common';
@@ -14,12 +15,18 @@ import {
   CreateHospitalRes,
 } from './dto/create-hospital.dto';
 import { ReadHospitalByIdRes, ReadHospitalsRes } from './dto/read-hospital.dto';
+import {
+  type UpdateHospitalReq,
+  UpdateHospitalReqZodType,
+  UpdateHospitalRes,
+} from './dto/update-hospital.dto';
 import { HospitalService } from './hospital.service';
 
 @Controller('hospitals')
 export class HospitalController {
   constructor(private readonly hospitalService: HospitalService) {}
 
+  //Admin only
   @UsePipes(new ZodValidationPipe(CreateHospitalReqZodType))
   @Post()
   async createHospital(
@@ -43,5 +50,18 @@ export class HospitalController {
     const page = query.page ? parseInt(query.page, 10) : 1;
     const limit = query.limit ? parseInt(query.limit, 10) : 10;
     return this.hospitalService.readHospitals({ page, limit });
+  }
+
+  //Staff and Admin only
+  @UsePipes(new ZodValidationPipe(UpdateHospitalReqZodType))
+  @Put(':id')
+  async updateHospital(
+    @Param('id') id: string,
+    @Body() body: UpdateHospitalReq,
+  ): Promise<UpdateHospitalRes> {
+    if (isNaN(Number(id))) {
+      throw new Error('Invalid ID format');
+    }
+    return this.hospitalService.updateHospital(Number(id), body);
   }
 }

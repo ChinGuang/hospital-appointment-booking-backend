@@ -42,4 +42,16 @@ export class HospitalRepoService {
       relations: ['address'],
     });
   }
+
+  async updateById(id: number, update: Partial<Hospital>): Promise<Hospital> {
+    await this.hospitalRepository.update(id, update);
+    const updatedHospital = await this.hospitalRepository.findOne({
+      where: { id },
+      relations: ['address'],
+    });
+    if (!updatedHospital) {
+      throw new Error('Hospital not found after update');
+    }
+    return updatedHospital;
+  }
 }
