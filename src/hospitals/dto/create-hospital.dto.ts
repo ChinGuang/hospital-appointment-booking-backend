@@ -1,0 +1,41 @@
+import { BaseResponseZodType } from 'src/common/interface';
+import z from 'zod';
+
+export const CreateHospitalReqZodType = z.object({
+  name: z.string(),
+  address: z.object({
+    addressLine1: z.string(),
+    addressLine2: z.string().optional(),
+    city: z.string(),
+    state: z.string(),
+    postalCode: z.string(),
+    country: z.string(),
+  }),
+  licenseNumber: z.string(),
+  smtpSetting: z
+    .object({
+      emailFrom: z.email().optional(),
+    })
+    .nullish(),
+});
+
+export type CreateHospitalReq = z.infer<typeof CreateHospitalReqZodType>;
+
+export const CreateHospitalResZodType = BaseResponseZodType.extend({
+  data: z.object({
+    id: z.number(),
+    name: z.string(),
+    licenseNumber: z.string(),
+    address: z.object({
+      id: z.number(),
+      addressLine1: z.string(),
+      addressLine2: z.string().nullish(),
+      city: z.string(),
+      state: z.string(),
+      postalCode: z.string(),
+      country: z.string(),
+    }),
+  }),
+});
+
+export type CreateHospitalRes = z.infer<typeof CreateHospitalResZodType>;
