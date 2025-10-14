@@ -1,9 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   CreateHospitalReq,
   CreateHospitalRes,
 } from './dto/create-hospital.dto';
-import { AddressRepoService } from './repo/address/address-repo.service';
+import { ReadHospitalByIdRes } from './dto/read-hospital.dto';
 import { HospitalSmtpSettingRepoService } from './repo/hospital-smtp-setting/hospital-smtp-setting-repo.service';
 import { HospitalRepoService } from './repo/hospital/hospital-repo.service';
 
@@ -11,7 +15,6 @@ import { HospitalRepoService } from './repo/hospital/hospital-repo.service';
 export class HospitalService {
   constructor(
     private readonly hospitalRepoService: HospitalRepoService,
-    private readonly addressRepoService: AddressRepoService,
     private readonly hospitalSmtpSettingRepoService: HospitalSmtpSettingRepoService,
   ) {}
 
@@ -27,15 +30,14 @@ export class HospitalService {
       );
     }
 
-    const address = await this.addressRepoService.create(payload.address);
     const hospital = await this.hospitalRepoService.create({
       name: payload.name,
       licenseNumber: payload.licenseNumber,
-      addressId: address.id,
+      address: payload.address,
     });
     if (payload.smtpSetting) {
       await this.hospitalSmtpSettingRepoService.create({
-        hospitalId: hospital.id,
+        hospital,
         ...payload.smtpSetting,
       });
     }
@@ -45,8 +47,19 @@ export class HospitalService {
         id: hospital.id,
         name: hospital.name,
         licenseNumber: hospital.licenseNumber,
-        address,
+        address: hospital.address,
       },
+    };
+  }
+
+  async readHospitalById(id: number): Promise<ReadHospitalByIdRes> {
+    const hospital = await this.hospitalRepoService.findById(id);
+    if (!hospital) {
+      throw new NotFoundException('Hospital not found');
+    }
+    return {
+      message: 'Hospital fetched successfully',
+      data: hospital,
     };
   }
 }

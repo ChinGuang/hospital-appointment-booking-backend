@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { RepoCreateHospitalPayload } from '../../models/hospital.interface';
 import { Hospital } from '../entities/hospital.entity';
 
 @Injectable()
@@ -22,7 +23,14 @@ export class HospitalRepoService {
       .then((count) => count > 0);
   }
 
-  async create(hospital: Omit<Hospital, 'id'>): Promise<Hospital> {
+  async create(hospital: RepoCreateHospitalPayload): Promise<Hospital> {
     return this.hospitalRepository.save(hospital);
+  }
+
+  async findById(id: number): Promise<Hospital | null> {
+    return this.hospitalRepository.findOne({
+      where: { id },
+      relations: ['address'],
+    });
   }
 }

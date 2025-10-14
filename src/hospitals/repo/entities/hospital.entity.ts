@@ -1,19 +1,10 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-
-@Entity()
-export class Hospital {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  name: string;
-
-  @Column()
-  addressId: number;
-
-  @Column()
-  licenseNumber: string;
-}
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Address {
@@ -39,12 +30,30 @@ export class Address {
   country: string;
 }
 
-export class HospitalSmtpSetting {
+@Entity()
+export class Hospital {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  hospitalId: number;
+  name: string;
+
+  @OneToOne(() => Address, { cascade: true })
+  @JoinColumn()
+  address: Address;
+
+  @Column()
+  licenseNumber: string;
+}
+
+@Entity()
+export class HospitalSmtpSetting {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @OneToOne(() => Hospital)
+  @JoinColumn()
+  hospital: Hospital;
 
   @Column({ nullable: true })
   emailFrom?: string;
