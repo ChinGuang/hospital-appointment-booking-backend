@@ -1,9 +1,9 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -42,11 +42,10 @@ export class HospitalController {
   }
 
   @Get(':id')
-  async getHospitalById(@Param('id') id: string): Promise<ReadHospitalByIdRes> {
-    if (isNaN(Number(id))) {
-      throw new BadRequestException('Invalid ID format');
-    }
-    return this.hospitalService.readHospitalById(Number(id));
+  async getHospitalById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ReadHospitalByIdRes> {
+    return this.hospitalService.readHospitalById(id);
   }
 
   @Get()
@@ -61,12 +60,9 @@ export class HospitalController {
   @UsePipes(new ZodValidationPipe(UpdateHospitalReqZodType))
   @Put(':id')
   async updateHospital(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateHospitalReq,
   ): Promise<UpdateHospitalRes> {
-    if (isNaN(Number(id))) {
-      throw new BadRequestException('Invalid ID format');
-    }
-    return this.hospitalService.updateHospital(Number(id), body);
+    return this.hospitalService.updateHospital(id, body);
   }
 }

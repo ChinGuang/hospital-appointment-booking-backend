@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RepoCreateHospitalPayload } from '../../models/hospital.interface';
@@ -51,7 +51,7 @@ export class HospitalRepoService {
       relations: ['address'],
     });
     if (!updatedHospital) {
-      throw new Error('Hospital not found after update');
+      throw new NotFoundException('Hospital not found after update');
     }
     return updatedHospital;
   }
