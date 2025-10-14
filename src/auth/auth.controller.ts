@@ -7,7 +7,7 @@ import {
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
-import { AuthUserGuard } from '../common/guards/auth-user.guard';
+import { AuthUserGuard } from '../common/guards/auth-user/auth-user.guard';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { AuthService } from './auth.service';
 import {

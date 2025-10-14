@@ -7,8 +7,10 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
   UsePipes,
 } from '@nestjs/common';
+import { AdminGuard } from '../common/guards/admin/admin.guard';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import {
   type CreateHospitalReq,
@@ -32,7 +34,7 @@ import { HospitalService } from './hospital.service';
 export class HospitalController {
   constructor(private readonly hospitalService: HospitalService) {}
 
-  //Admin only
+  @UseGuards(AdminGuard)
   @UsePipes(new ZodValidationPipe(CreateHospitalReqZodType))
   @Post()
   async createHospital(
