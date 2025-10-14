@@ -11,7 +11,10 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { AdminGuard } from '../common/guards/admin/admin.guard';
+import { Permissions } from '../common/guards/permission/permission.decorator';
+import { PermissionGuard } from '../common/guards/permission/permission.guard';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
+import { PermissionType } from '../staff/enums/permission.enum';
 import {
   type CreateHospitalReq,
   CreateHospitalReqZodType,
@@ -58,7 +61,8 @@ export class HospitalController {
     return this.hospitalService.readHospitals(query);
   }
 
-  //Staff and Admin only
+  @Permissions([PermissionType.UPDATE_HOSPITAL])
+  @UseGuards(PermissionGuard)
   @UsePipes(new ZodValidationPipe(UpdateHospitalReqZodType))
   @Put(':id')
   async updateHospital(
