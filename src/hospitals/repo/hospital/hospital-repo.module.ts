@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Hospital } from '../entities/hospital.entity';
+import { Address, Hospital } from '../entities/hospital.entity';
 import { HospitalRepoService } from './hospital-repo.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Hospital]), // Add your entities here
-  ],
+  imports: [TypeOrmModule.forFeature([Hospital, Address])],
   providers: [HospitalRepoService],
   exports: [HospitalRepoService],
 })

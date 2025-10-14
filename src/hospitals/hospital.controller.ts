@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -14,7 +15,12 @@ import {
   CreateHospitalReqZodType,
   CreateHospitalRes,
 } from './dto/create-hospital.dto';
-import { ReadHospitalByIdRes, ReadHospitalsRes } from './dto/read-hospital.dto';
+import {
+  type ReadHospitalByIdRes,
+  type ReadHospitalsReq,
+  ReadHospitalsReqZodType,
+  type ReadHospitalsRes,
+} from './dto/read-hospital.dto';
 import {
   type UpdateHospitalReq,
   UpdateHospitalReqZodType,
@@ -38,18 +44,17 @@ export class HospitalController {
   @Get(':id')
   async getHospitalById(@Param('id') id: string): Promise<ReadHospitalByIdRes> {
     if (isNaN(Number(id))) {
-      throw new Error('Invalid ID format');
+      throw new BadRequestException('Invalid ID format');
     }
     return this.hospitalService.readHospitalById(Number(id));
   }
 
   @Get()
   async getHospitals(
-    @Query() query: { page?: string; limit?: string },
+    @Query(new ZodValidationPipe(ReadHospitalsReqZodType))
+    query: ReadHospitalsReq,
   ): Promise<ReadHospitalsRes> {
-    const page = query.page ? parseInt(query.page, 10) : 1;
-    const limit = query.limit ? parseInt(query.limit, 10) : 10;
-    return this.hospitalService.readHospitals({ page, limit });
+    return this.hospitalService.readHospitals(query);
   }
 
   //Staff and Admin only
@@ -60,7 +65,7 @@ export class HospitalController {
     @Body() body: UpdateHospitalReq,
   ): Promise<UpdateHospitalRes> {
     if (isNaN(Number(id))) {
-      throw new Error('Invalid ID format');
+      throw new BadRequestException('Invalid ID format');
     }
     return this.hospitalService.updateHospital(Number(id), body);
   }

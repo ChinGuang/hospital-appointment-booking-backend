@@ -17,8 +17,9 @@ export class HospitalRepoService {
   ): Promise<boolean> {
     return this.hospitalRepository
       .createQueryBuilder('hospital')
+      .leftJoin('hospital.address', 'address')
       .where('hospital.licenseNumber = :licenseNumber', { licenseNumber })
-      .andWhere('hospital.country = :country', { country })
+      .andWhere('address.country = :country', { country })
       .getCount()
       .then((count) => count > 0);
   }

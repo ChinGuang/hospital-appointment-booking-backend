@@ -8,8 +8,8 @@ export const ReadHospitalByIdResZodType = BaseResponseZodType.extend({
 export type ReadHospitalByIdRes = z.infer<typeof ReadHospitalByIdResZodType>;
 
 export const ReadHospitalsReqZodType = z.object({
-  page: z.number(),
-  limit: z.number(),
+  page: z.coerce.number().int().positive().optional(),
+  limit: z.coerce.number().int().positive().optional(),
 });
 
 export type ReadHospitalsReq = z.infer<typeof ReadHospitalsReqZodType>;
