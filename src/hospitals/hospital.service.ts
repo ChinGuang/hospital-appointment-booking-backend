@@ -7,7 +7,11 @@ import {
   CreateHospitalReq,
   CreateHospitalRes,
 } from './dto/create-hospital.dto';
-import { ReadHospitalByIdRes } from './dto/read-hospital.dto';
+import {
+  ReadHospitalByIdRes,
+  ReadHospitalsReq,
+  ReadHospitalsRes,
+} from './dto/read-hospital.dto';
 import { HospitalSmtpSettingRepoService } from './repo/hospital-smtp-setting/hospital-smtp-setting-repo.service';
 import { HospitalRepoService } from './repo/hospital/hospital-repo.service';
 
@@ -60,6 +64,21 @@ export class HospitalService {
     return {
       message: 'Hospital fetched successfully',
       data: hospital,
+    };
+  }
+
+  async readHospitals(payload: ReadHospitalsReq): Promise<ReadHospitalsRes> {
+    const page = payload.page && payload.page > 0 ? payload.page : 1;
+    const limit = payload.limit && payload.limit > 0 ? payload.limit : 10;
+    const skip = (page - 1) * limit;
+
+    const hospitals = await this.hospitalRepoService.find({
+      skip,
+      take: limit,
+    });
+    return {
+      message: 'Hospitals fetched successfully',
+      data: hospitals,
     };
   }
 }

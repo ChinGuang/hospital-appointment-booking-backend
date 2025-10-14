@@ -33,4 +33,13 @@ export class HospitalRepoService {
       relations: ['address'],
     });
   }
+
+  async find(payload: { skip?: number; take?: number }): Promise<Hospital[]> {
+    const { skip = 0, take = 10 } = payload;
+    return this.hospitalRepository.find({
+      skip,
+      take,
+      relations: ['address'],
+    });
+  }
 }
