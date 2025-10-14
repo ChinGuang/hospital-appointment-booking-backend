@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
+import { HospitalModule } from './hospitals/hospital.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuthModule } from './auth/auth.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    HospitalModule,
   ],
 })
 export class AppModule {
