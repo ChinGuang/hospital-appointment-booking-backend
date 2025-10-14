@@ -1,4 +1,4 @@
-import { ExecutionContext } from '@nestjs/common';
+import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { AuthUserGuard } from './auth-user.guard';
 
 describe('AuthUserGuard', () => {
@@ -21,35 +21,35 @@ describe('AuthUserGuard', () => {
       }),
     }) as unknown as ExecutionContext;
 
-  it('should return false if no authorization header', () => {
+  it('should throw unauthorizedException if no authorization header', () => {
     const context = createMockContext({});
-    expect(guard.canActivate(context)).toBe(false);
+    expect(() => guard.canActivate(context)).toThrow(UnauthorizedException);
   });
 
-  it('should return false if authorization header is not Bearer', () => {
+  it('should throw unauthorizedException if authorization header is not Bearer', () => {
     const context = createMockContext({ authorization: 'Basic abc' });
-    expect(guard.canActivate(context)).toBe(false);
+    expect(() => guard.canActivate(context)).toThrow(UnauthorizedException);
   });
 
-  it('should return false if token verification throws error', () => {
+  it('should throw unauthorizedException if token verification throws error', () => {
     mockAuthJwtService.verify.mockImplementation(() => {
       throw new Error('Invalid token');
     });
     const context = createMockContext({ authorization: 'Bearer invalidtoken' });
-    expect(guard.canActivate(context)).toBe(false);
+    expect(() => guard.canActivate(context)).toThrow(UnauthorizedException);
   });
 
-  it('should return false if decoded token does not have userId or exp', () => {
+  it('should throw unauthorizedException if decoded token does not have userId or exp', () => {
     mockAuthJwtService.verify.mockReturnValue({});
     const context = createMockContext({ authorization: 'Bearer validtoken' });
-    expect(guard.canActivate(context)).toBe(false);
+    expect(() => guard.canActivate(context)).toThrow(UnauthorizedException);
   });
 
-  it('should return false if token is expired', () => {
+  it('should throw unauthorizedException if token is expired', () => {
     const expiredExp = Math.floor(Date.now() / 1000) - 10;
     mockAuthJwtService.verify.mockReturnValue({ userId: 1, exp: expiredExp });
     const context = createMockContext({ authorization: 'Bearer validtoken' });
-    expect(guard.canActivate(context)).toBe(false);
+    expect(() => guard.canActivate(context)).toThrow(UnauthorizedException);
   });
 
   it('should return true and attach user if token is valid and not expired', () => {
@@ -68,21 +68,21 @@ describe('AuthUserGuard', () => {
     expect(req.user).toEqual(decoded);
   });
 
-  it('should return false if request is not an object', () => {
+  it('should throw unauthorizedException if request is not an object', () => {
     const context = {
       switchToHttp: () => ({
         getRequest: () => null,
       }),
     } as unknown as ExecutionContext;
-    expect(guard.canActivate(context)).toBe(false);
+    expect(() => guard.canActivate(context)).toThrow(UnauthorizedException);
   });
 
-  it('should return false if headers is not an object', () => {
+  it('should throw unauthorizedException if headers is not an object', () => {
     const context = {
       switchToHttp: () => ({
         getRequest: () => ({ headers: null }),
       }),
     } as unknown as ExecutionContext;
-    expect(guard.canActivate(context)).toBe(false);
+    expect(() => guard.canActivate(context)).toThrow(UnauthorizedException);
   });
 });

@@ -1,9 +1,19 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthJwtService } from '../services/auth-jwt/auth-jwt.service';
 
 @Injectable()
 export class AuthUserGuard implements CanActivate {
   constructor(private readonly authJwtService: AuthJwtService) {}
+
+  private unauthorizedHandle(): never {
+    throw new UnauthorizedException('Invalid Token');
+  }
+
   canActivate(context: ExecutionContext): boolean {
     const request: unknown = context.switchToHttp().getRequest();
     if (
@@ -25,21 +35,21 @@ export class AuthUserGuard implements CanActivate {
             'exp' in decoded &&
             typeof decoded.exp === 'number'
           ) {
-            console.log(Date.now() / 1000, decoded.exp);
+            const currentTime = Math.floor(Date.now() / 1000);
             // Check token expiration if 'exp' field exists
-            if (decoded.exp < Date.now() / 1000) {
+            if (decoded.exp < currentTime) {
               console.log('Token is expired');
-              return false;
+              this.unauthorizedHandle();
             }
             request['user'] = decoded;
             return true;
           }
         } catch (error) {
           console.error('Token verification failed:', error);
-          return false;
+          this.unauthorizedHandle();
         }
       }
     }
-    return false;
+    this.unauthorizedHandle();
   }
 }
