@@ -1,14 +1,14 @@
 import {
-    Body,
-    Controller,
-    Get,
-    Param,
-    ParseIntPipe,
-    Post,
-    Put,
-    Query,
-    UseGuards,
-    UsePipes,
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { AdminGuard } from '../common/guards/admin/admin.guard';
 import { Permissions } from '../common/guards/permission/permission.decorator';
@@ -16,20 +16,20 @@ import { PermissionGuard } from '../common/guards/permission/permission.guard';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { PermissionType } from '../permissions/enums/permission.enum';
 import {
-    type CreateHospitalReq,
-    CreateHospitalReqZodType,
-    CreateHospitalRes,
+  type CreateHospitalReq,
+  CreateHospitalReqZodType,
+  CreateHospitalRes,
 } from './dto/create-hospital.dto';
 import {
-    type ReadHospitalByIdRes,
-    type ReadHospitalsReq,
-    ReadHospitalsReqZodType,
-    type ReadHospitalsRes,
+  type ReadHospitalByIdRes,
+  type ReadHospitalsReq,
+  ReadHospitalsReqZodType,
+  type ReadHospitalsRes,
 } from './dto/read-hospital.dto';
 import {
-    type UpdateHospitalReq,
-    UpdateHospitalReqZodType,
-    UpdateHospitalRes,
+  type UpdateHospitalReq,
+  UpdateHospitalReqZodType,
+  UpdateHospitalRes,
 } from './dto/update-hospital.dto';
 import { HospitalService } from './hospital.service';
 
