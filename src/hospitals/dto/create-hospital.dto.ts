@@ -3,21 +3,26 @@ import z from 'zod';
 import { HospitalZodType } from './base.dto';
 
 export const CreateHospitalReqZodType = z.object({
-  name: z.string(),
+  name: z.string().trim(),
   address: z.object({
-    addressLine1: z.string(),
-    addressLine2: z.string().optional(),
-    city: z.string(),
-    state: z.string(),
-    postalCode: z.string(),
-    country: z.string(),
+    addressLine1: z.string().trim(),
+    addressLine2: z.string().trim().optional(),
+    city: z.string().trim(),
+    state: z.string().trim(),
+    postalCode: z.string().trim(),
+    country: z.string().trim(),
   }),
-  licenseNumber: z.string(),
+  licenseNumber: z.string().trim(),
   smtpSetting: z
     .object({
-      emailFrom: z.email().optional(),
+      emailFrom: z.email().trim().optional(),
     })
     .nullish(),
+  admin: z.object({
+    username: z.string().trim(),
+    email: z.email().trim(),
+    password: z.string(),
+  }),
 });
 
 export type CreateHospitalReq = z.infer<typeof CreateHospitalReqZodType>;
