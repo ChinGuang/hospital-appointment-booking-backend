@@ -21,14 +21,14 @@ export class Doctor {
   @Column({ type: 'int' })
   experienceStartYear: number;
 
-  @ManyToMany(() => Specialization, { cascade: true })
+  @ManyToMany(() => Specialization, { cascade: true, onDelete: 'NO ACTION' })
   @JoinTable()
   specializations: Specialization[];
 
-  @ManyToMany(() => Language, { cascade: true })
+  @ManyToMany(() => Language, { cascade: true, onDelete: 'NO ACTION' })
   @JoinTable()
   spokenLangauges: Language[];
 
-  @ManyToOne(() => Hospital, { eager: true })
+  @ManyToOne(() => Hospital, { eager: true, onDelete: 'NO ACTION' })
   hospital: Hospital;
 }

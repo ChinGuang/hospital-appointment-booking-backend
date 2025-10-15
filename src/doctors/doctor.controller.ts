@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   Param,
@@ -22,6 +23,7 @@ import {
   CreateDoctorReqZodType,
   CreateDoctorRes,
 } from './dto/create-doctor.dto';
+import { DeleteDoctorRes } from './dto/delete-doctor.dto';
 import {
   type UpdateDoctorReq,
   UpdateDoctorReqZodType,
@@ -74,5 +76,12 @@ export class DoctorController {
     @Body() body: UpdateDoctorReq,
   ): Promise<UpdateDoctorRes> {
     return await this.doctorService.updateDoctor(id, body);
+  }
+
+  @Permissions([PermissionType.DELETE_DOCTOR])
+  @UseGuards(PermissionGuard)
+  @Delete('doctors/:id')
+  async deleteDoctor(@Param('id') id: number): Promise<DeleteDoctorRes> {
+    return await this.doctorService.deleteDoctor(id);
   }
 }

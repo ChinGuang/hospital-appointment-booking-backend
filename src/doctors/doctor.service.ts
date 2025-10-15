@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { HospitalRepoService } from '../hospitals/repo/hospital/hospital-repo.service';
 import { CreateDoctorReq, CreateDoctorRes } from './dto/create-doctor.dto';
+import { DeleteDoctorRes } from './dto/delete-doctor.dto';
 import { UpdateDoctorReq, UpdateDoctorRes } from './dto/update-doctor.dto';
 import {
   ViewDoctorRes,
@@ -113,6 +114,20 @@ export class DoctorService {
     );
     return {
       message: 'Doctor updated successfully',
+      data: {
+        id: doctor.id,
+        fullName: doctor.fullName,
+        experienceStartYear: doctor.experienceStartYear,
+        specializations: doctor.specializations.map((s) => s.name),
+        spokenLangauges: doctor.spokenLangauges.map((s) => s.name),
+      },
+    };
+  }
+
+  async deleteDoctor(doctorId: number): Promise<DeleteDoctorRes> {
+    const doctor = await this.doctorRepoService.deleteById(doctorId);
+    return {
+      message: 'Doctor deleted successfully',
       data: {
         id: doctor.id,
         fullName: doctor.fullName,

@@ -41,4 +41,12 @@ export class DoctorRepoService {
     }
     return doctor;
   }
+
+  async deleteById(id: number): Promise<Doctor> {
+    const doctor = await this.doctorRepository.findOneBy({ id });
+    if (!doctor) {
+      throw new NotFoundException('Doctor not found');
+    }
+    return await this.doctorRepository.remove(doctor);
+  }
 }
