@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { RoleModule } from '../role/role.module';
-import { StaffModule } from '../staff/staff.module';
+import { StaffRepoModule } from '../staff/repo/staff-repo.module';
 import { UserModule } from '../users/user.module';
 import { HospitalController } from './hospital.controller';
 import { HospitalService } from './hospital.service';
@@ -11,7 +11,7 @@ import { HospitalRepoModule } from './repo/hospital/hospital-repo.module';
   imports: [
     HospitalRepoModule,
     HospitalSmtpSettingRepoModule,
-    StaffModule,
+    StaffRepoModule,
     RoleModule,
     UserModule,
   ],

@@ -1,11 +1,11 @@
 import {
-    CanActivate,
-    ExecutionContext,
-    ForbiddenException,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PermissionType } from 'src/permissions/enums/permission.enum';
-import { StaffService } from '../../../staff/staff.service';
+import { StaffRepoService } from '../../../staff/repo/staff-repo.service';
 import { UserType } from '../../../users/enums/user.enum';
 import { AuthJwtService } from '../../services/auth-jwt/auth-jwt.service';
 import { ErrorUtils } from '../../utils/errors';
@@ -14,7 +14,7 @@ import { Permissions } from './permission.decorator';
 
 export class PermissionGuard extends BaseAuthGuard implements CanActivate {
   constructor(
-    private readonly staffService: StaffService,
+    private readonly staffRepoService: StaffRepoService,
     private reflector: Reflector,
     authJwtService: AuthJwtService,
   ) {
@@ -37,7 +37,7 @@ export class PermissionGuard extends BaseAuthGuard implements CanActivate {
               typeof decodedUser.userId === 'number'
                 ? decodedUser.userId
                 : parseInt(decodedUser.userId as string, 10);
-            const staff = await this.staffService.getStaffByUserId(userId);
+            const staff = await this.staffRepoService.getStaffByUserId(userId);
             if (staff) {
               const staffPermissions = staff.role.permissions.map(
                 (p) => p.type,
@@ -46,6 +46,9 @@ export class PermissionGuard extends BaseAuthGuard implements CanActivate {
                 staffPermissions.includes(PermissionType.ALL) ||
                 permissionNeeded.every((p) => staffPermissions.includes(p))
               ) {
+                if (request && typeof request === 'object') {
+                  request['staff'] = staff;
+                }
                 return true;
               }
               throw new ForbiddenException(

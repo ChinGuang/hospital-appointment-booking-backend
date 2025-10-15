@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Permission } from '../permissions/entities/permission.entity';
-import { Role } from '../role/entities/role.entity';
-import { Staff } from './entities/staff.entity';
+import { HospitalRepoModule } from '../hospitals/repo/hospital/hospital-repo.module';
+import { RoleModule } from '../role/role.module';
+import { UserModule } from '../users/user.module';
+import { StaffRepoModule } from './repo/staff-repo.module';
+import { StaffController } from './staff.controller';
 import { StaffService } from './staff.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Staff, Role, Permission])],
+  imports: [StaffRepoModule, UserModule, RoleModule, HospitalRepoModule],
+  controllers: [StaffController],
   providers: [StaffService],
   exports: [StaffService],
 })

@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Argon2Utils } from '../common/utils/argon2';
 import { RoleService } from '../role/role.service';
-import { StaffService } from '../staff/staff.service';
+import { StaffRepoService } from '../staff/repo/staff-repo.service';
 import { UserType } from '../users/enums/user.enum';
 import { UserService } from '../users/user.service';
 import {
@@ -30,7 +30,7 @@ export class HospitalService {
     private readonly hospitalRepoService: HospitalRepoService,
     private readonly hospitalSmtpSettingRepoService: HospitalSmtpSettingRepoService,
     private readonly userService: UserService,
-    private readonly staffService: StaffService,
+    private readonly staffService: StaffRepoService,
     private readonly roleService: RoleService,
   ) {}
 

@@ -32,4 +32,12 @@ export class RoleService {
     }
     return defaultStaffRole;
   }
+
+  async getRoleById(id: number): Promise<Role | null> {
+    return this.roleRepository.findOne({
+      where: {
+        id,
+      },
+    });
+  }
 }

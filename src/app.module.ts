@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
 import { HospitalModule } from './hospitals/hospital.module';
+import { StaffModule } from './staff/staff.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { HospitalModule } from './hospitals/hospital.module';
       envFilePath: '.env',
     }),
     HospitalModule,
+    StaffModule,
   ],
 })
 export class AppModule {
