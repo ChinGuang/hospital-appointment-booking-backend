@@ -20,13 +20,6 @@ export class StaffService {
     payload: CreateStaffReq,
     hospitalId: number,
   ): Promise<CreateStaffRes> {
-    const hashedPassword = await Argon2Utils.hashPassword(payload.password);
-    const user = await this.userService.createUser({
-      username: payload.username,
-      email: payload.email,
-      password: hashedPassword,
-      userType: UserType.STAFF,
-    });
     const role = await this.roleService.getRoleById(payload.roleId);
     if (!role) {
       throw new NotFoundException('Role not found');
@@ -35,6 +28,13 @@ export class StaffService {
     if (!hospital) {
       throw new NotFoundException('Hospital not found');
     }
+    const hashedPassword = await Argon2Utils.hashPassword(payload.password);
+    const user = await this.userService.createUser({
+      username: payload.username,
+      email: payload.email,
+      password: hashedPassword,
+      userType: UserType.STAFF,
+    });
     await this.staffRepoService.createStaff({
       userId: user.id,
       user: user,
