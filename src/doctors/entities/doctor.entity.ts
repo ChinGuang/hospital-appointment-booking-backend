@@ -27,7 +27,7 @@ export class Doctor {
 
   @ManyToMany(() => Language, { cascade: true, onDelete: 'NO ACTION' })
   @JoinTable()
-  spokenLangauges: Language[];
+  spokenLanguages: Language[];
 
   @ManyToOne(() => Hospital, { eager: true, onDelete: 'NO ACTION' })
   hospital: Hospital;

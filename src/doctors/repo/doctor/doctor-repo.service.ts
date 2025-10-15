@@ -26,16 +26,35 @@ export class DoctorRepoService {
       where: whereCondition,
       take: limit,
       skip: (page - 1) * limit,
+      relations: {
+        specializations: true,
+        spokenLanguages: true,
+        hospital: true,
+      },
     });
   }
 
   async findById(id: number): Promise<Doctor | null> {
-    return await this.doctorRepository.findOneBy({ id });
+    return await this.doctorRepository.findOne({
+      where: { id },
+      relations: {
+        specializations: true,
+        spokenLanguages: true,
+        hospital: true,
+      },
+    });
   }
 
   async updateById(id: number, payload: Partial<Doctor>): Promise<Doctor> {
     await this.doctorRepository.update(id, payload);
-    const doctor = await this.doctorRepository.findOneBy({ id });
+    const doctor = await this.doctorRepository.findOne({
+      where: { id },
+      relations: {
+        specializations: true,
+        spokenLanguages: true,
+        hospital: true,
+      },
+    });
     if (!doctor) {
       throw new NotFoundException('Doctor not found');
     }
@@ -43,7 +62,14 @@ export class DoctorRepoService {
   }
 
   async deleteById(id: number): Promise<Doctor> {
-    const doctor = await this.doctorRepository.findOneBy({ id });
+    const doctor = await this.doctorRepository.findOne({
+      where: { id },
+      relations: {
+        specializations: true,
+        spokenLanguages: true,
+        hospital: true,
+      },
+    });
     if (!doctor) {
       throw new NotFoundException('Doctor not found');
     }

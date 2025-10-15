@@ -30,7 +30,7 @@ export class DoctorService {
       payload.specializations,
     );
     const languages = await this.languageRepoService.findElseCreate(
-      payload.spokenLangauges,
+      payload.spokenLanguages,
     );
     const hospital = await this.hospitalRepoService.findById(hospitalId);
     if (!hospital) {
@@ -39,7 +39,7 @@ export class DoctorService {
     const doctor = await this.doctorRepoService.create({
       ...payload,
       specializations,
-      spokenLangauges: languages,
+      spokenLanguages: languages,
       hospital,
     });
     return {
@@ -49,7 +49,7 @@ export class DoctorService {
         fullName: doctor.fullName,
         experienceStartYear: doctor.experienceStartYear,
         specializations: doctor.specializations.map((s) => s.name),
-        spokenLangauges: doctor.spokenLangauges.map((s) => s.name),
+        spokenLanguages: doctor.spokenLanguages.map((s) => s.name),
       },
     };
   }
@@ -65,7 +65,7 @@ export class DoctorService {
         fullName: doctor.fullName,
         experienceStartYear: doctor.experienceStartYear,
         specializations: doctor.specializations.map((s) => s.name),
-        spokenLangauges: doctor.spokenLangauges.map((s) => s.name),
+        spokenLanguages: doctor.spokenLanguages.map((s) => s.name),
       })),
     };
   }
@@ -82,7 +82,7 @@ export class DoctorService {
         fullName: doctor.fullName,
         experienceStartYear: doctor.experienceStartYear,
         specializations: doctor.specializations.map((s) => s.name),
-        spokenLangauges: doctor.spokenLangauges.map((s) => s.name),
+        spokenLanguages: doctor.spokenLanguages.map((s) => s.name),
       },
     };
   }
@@ -96,8 +96,8 @@ export class DoctorService {
           payload.specializations,
         )
       : undefined;
-    const languages = payload.spokenLangauges
-      ? await this.languageRepoService.findElseCreate(payload.spokenLangauges)
+    const languages = payload.spokenLanguages
+      ? await this.languageRepoService.findElseCreate(payload.spokenLanguages)
       : undefined;
     const updatePayload: Partial<Doctor> = {
       ...(payload.fullName !== undefined && { fullName: payload.fullName }),
@@ -105,7 +105,7 @@ export class DoctorService {
         experienceStartYear: payload.experienceStartYear,
       }),
       ...(specializations !== undefined && { specializations }),
-      ...(languages !== undefined && { spokenLangauges: languages }),
+      ...(languages !== undefined && { spokenLanguages: languages }),
     };
 
     const doctor = await this.doctorRepoService.updateById(
@@ -119,7 +119,7 @@ export class DoctorService {
         fullName: doctor.fullName,
         experienceStartYear: doctor.experienceStartYear,
         specializations: doctor.specializations.map((s) => s.name),
-        spokenLangauges: doctor.spokenLangauges.map((s) => s.name),
+        spokenLanguages: doctor.spokenLanguages.map((s) => s.name),
       },
     };
   }
@@ -133,7 +133,7 @@ export class DoctorService {
         fullName: doctor.fullName,
         experienceStartYear: doctor.experienceStartYear,
         specializations: doctor.specializations.map((s) => s.name),
-        spokenLangauges: doctor.spokenLangauges.map((s) => s.name),
+        spokenLanguages: doctor.spokenLanguages.map((s) => s.name),
       },
     };
   }

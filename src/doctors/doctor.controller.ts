@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -12,6 +13,7 @@ import {
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { Permissions } from '../common/guards/permission/permission.decorator';
 import { PermissionGuard } from '../common/guards/permission/permission.guard';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
@@ -63,7 +65,9 @@ export class DoctorController {
   }
 
   @Get('doctors/:id')
-  async viewDoctor(@Param('id') id: number): Promise<ViewDoctorRes> {
+  async viewDoctor(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ViewDoctorRes> {
     return await this.doctorService.viewDoctor(id);
   }
 
@@ -72,7 +76,7 @@ export class DoctorController {
   @Put('doctors/:id')
   @UsePipes(new ZodValidationPipe(UpdateDoctorReqZodType))
   async updateDoctor(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateDoctorReq,
   ): Promise<UpdateDoctorRes> {
     return await this.doctorService.updateDoctor(id, body);
@@ -81,7 +85,9 @@ export class DoctorController {
   @Permissions([PermissionType.DELETE_DOCTOR])
   @UseGuards(PermissionGuard)
   @Delete('doctors/:id')
-  async deleteDoctor(@Param('id') id: number): Promise<DeleteDoctorRes> {
+  async deleteDoctor(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<DeleteDoctorRes> {
     return await this.doctorService.deleteDoctor(id);
   }
 }

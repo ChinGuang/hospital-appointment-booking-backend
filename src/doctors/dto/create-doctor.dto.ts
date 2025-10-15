@@ -6,7 +6,7 @@ export const CreateDoctorReqZodType = z.object({
   fullName: z.string(),
   experienceStartYear: z.number().int().positive(),
   specializations: z.array(z.string()),
-  spokenLangauges: z.array(z.string()),
+  spokenLanguages: z.array(z.string()),
 });
 
 export type CreateDoctorReq = z.infer<typeof CreateDoctorReqZodType>;

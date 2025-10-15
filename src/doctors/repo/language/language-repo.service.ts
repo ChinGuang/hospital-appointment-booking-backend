@@ -11,20 +11,18 @@ export class LanguageRepoService {
   ) {}
 
   async findElseCreate(names: string[]): Promise<Language[]> {
-    const languages = await this.languageRepository.find({
-      where: {
-        name: In(names),
-      },
+    const unique = [...new Set(names.map((n) => n.trim()))].filter(Boolean);
+    if (unique.length === 0) return [];
+    const found = await this.languageRepository.find({
+      where: { name: In(unique) },
     });
-
-    const languagesToCreate = names.filter(
-      (name) => !languages.some((s) => s.name === name),
-    );
-
-    const newLanguages = this.languageRepository.create(
-      languagesToCreate.map((name) => ({ name })),
-    );
-
-    return [...languages, ...newLanguages];
+    const missing = unique.filter((n) => !found.some((f) => f.name === n));
+    if (missing.length) {
+      await this.languageRepository.upsert(
+        missing.map((name) => ({ name })),
+        ['name'],
+      );
+    }
+    return this.languageRepository.find({ where: { name: In(unique) } });
   }
 }
