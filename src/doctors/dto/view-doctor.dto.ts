@@ -15,3 +15,9 @@ export const ViewDoctorsResZodType = BaseResponseZodType.extend({
 });
 
 export type ViewDoctorsRes = z.infer<typeof ViewDoctorsResZodType>;
+
+export const ViewDoctorResZodType = BaseResponseZodType.extend({
+  data: DoctorZodType,
+});
+
+export type ViewDoctorRes = z.infer<typeof ViewDoctorResZodType>;

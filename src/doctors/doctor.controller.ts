@@ -3,6 +3,7 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  Param,
   Post,
   Query,
   Req,
@@ -21,6 +22,7 @@ import {
   CreateDoctorRes,
 } from './dto/create-doctor.dto';
 import {
+  ViewDoctorRes,
   type ViewDoctorsReq,
   ViewDoctorsReqZodType,
   ViewDoctorsRes,
@@ -50,5 +52,10 @@ export class DoctorController {
     queries: ViewDoctorsReq,
   ): Promise<ViewDoctorsRes> {
     return await this.doctorService.viewDoctors(queries);
+  }
+
+  @Get('doctors/:id')
+  async viewDoctor(@Param('id') id: number): Promise<ViewDoctorRes> {
+    return await this.doctorService.viewDoctor(id);
   }
 }

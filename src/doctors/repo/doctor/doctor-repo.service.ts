@@ -28,4 +28,8 @@ export class DoctorRepoService {
       skip: (page - 1) * limit,
     });
   }
+
+  async findById(id: number): Promise<Doctor | null> {
+    return await this.doctorRepository.findOneBy({ id });
+  }
 }

@@ -1,7 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { HospitalRepoService } from '../hospitals/repo/hospital/hospital-repo.service';
 import { CreateDoctorReq, CreateDoctorRes } from './dto/create-doctor.dto';
-import { ViewDoctorsReq, ViewDoctorsRes } from './dto/view-doctor.dto';
+import {
+  ViewDoctorRes,
+  ViewDoctorsReq,
+  ViewDoctorsRes,
+} from './dto/view-doctor.dto';
 import { DoctorRepoService } from './repo/doctor/doctor-repo.service';
 import { LanguageRepoService } from './repo/language/language-repo.service';
 import { SpecializationRepoService } from './repo/specialization/specialization-repo.service';
@@ -60,6 +64,23 @@ export class DoctorService {
         specializations: doctor.specializations.map((s) => s.name),
         spokenLangauges: doctor.spokenLangauges.map((s) => s.name),
       })),
+    };
+  }
+
+  async viewDoctor(doctorId: number): Promise<ViewDoctorRes> {
+    const doctor = await this.doctorRepoService.findById(doctorId);
+    if (!doctor) {
+      throw new NotFoundException('Doctor not found');
+    }
+    return {
+      message: 'Doctor fetched successfully',
+      data: {
+        id: doctor.id,
+        fullName: doctor.fullName,
+        experienceStartYear: doctor.experienceStartYear,
+        specializations: doctor.specializations.map((s) => s.name),
+        spokenLangauges: doctor.spokenLangauges.map((s) => s.name),
+      },
     };
   }
 }
