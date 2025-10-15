@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   ForbiddenException,
+  Get,
   Post,
+  Query,
   Req,
   UseGuards,
   UsePipes,
@@ -18,6 +20,11 @@ import {
   CreateDoctorReqZodType,
   CreateDoctorRes,
 } from './dto/create-doctor.dto';
+import {
+  type ViewDoctorsReq,
+  ViewDoctorsReqZodType,
+  ViewDoctorsRes,
+} from './dto/view-doctor.dto';
 
 @Controller()
 export class DoctorController {
@@ -35,5 +42,13 @@ export class DoctorController {
       throw new ForbiddenException('Access denied: Staff only');
     }
     return await this.doctorService.createDoctor(body, req.staff?.hospital.id);
+  }
+
+  @Get('doctors')
+  async viewDoctors(
+    @Query(new ZodValidationPipe(ViewDoctorsReqZodType))
+    queries: ViewDoctorsReq,
+  ): Promise<ViewDoctorsRes> {
+    return await this.doctorService.viewDoctors(queries);
   }
 }

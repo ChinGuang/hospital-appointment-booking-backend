@@ -1,5 +1,6 @@
 import { BaseResponseZodType } from 'src/common/interface';
 import z from 'zod';
+import { DoctorZodType } from './base-doctor.dto';
 
 export const CreateDoctorReqZodType = z.object({
   fullName: z.string(),
@@ -11,13 +12,7 @@ export const CreateDoctorReqZodType = z.object({
 export type CreateDoctorReq = z.infer<typeof CreateDoctorReqZodType>;
 
 export const CreateDoctorResZodType = BaseResponseZodType.extend({
-  data: z.object({
-    id: z.number(),
-    fullName: z.string(),
-    experienceStartYear: z.number().int().positive(),
-    specializations: z.array(z.string()),
-    spokenLangauges: z.array(z.string()),
-  }),
+  data: DoctorZodType,
 });
 
 export type CreateDoctorRes = z.infer<typeof CreateDoctorResZodType>;
