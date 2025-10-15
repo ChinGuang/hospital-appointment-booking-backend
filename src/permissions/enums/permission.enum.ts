@@ -5,4 +5,5 @@ export enum PermissionType {
   CREATE_ROLE = 4,
   CREATE_STAFF = 5,
   CREATE_DOCTOR = 6,
+  UPDATE_DOCTOR = 7,
 }

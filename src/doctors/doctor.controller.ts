@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -21,6 +22,11 @@ import {
   CreateDoctorReqZodType,
   CreateDoctorRes,
 } from './dto/create-doctor.dto';
+import {
+  type UpdateDoctorReq,
+  UpdateDoctorReqZodType,
+  UpdateDoctorRes,
+} from './dto/update-doctor.dto';
 import {
   ViewDoctorRes,
   type ViewDoctorsReq,
@@ -57,5 +63,16 @@ export class DoctorController {
   @Get('doctors/:id')
   async viewDoctor(@Param('id') id: number): Promise<ViewDoctorRes> {
     return await this.doctorService.viewDoctor(id);
+  }
+
+  @Permissions([PermissionType.UPDATE_DOCTOR])
+  @UseGuards(PermissionGuard)
+  @Put('doctors/:id')
+  @UsePipes(new ZodValidationPipe(UpdateDoctorReqZodType))
+  async updateDoctor(
+    @Param('id') id: number,
+    @Body() body: UpdateDoctorReq,
+  ): Promise<UpdateDoctorRes> {
+    return await this.doctorService.updateDoctor(id, body);
   }
 }

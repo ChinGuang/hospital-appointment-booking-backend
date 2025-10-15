@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FindOptionsWhere, Repository } from 'typeorm';
 import { Doctor } from '../../entities/doctor.entity';
@@ -31,5 +31,14 @@ export class DoctorRepoService {
 
   async findById(id: number): Promise<Doctor | null> {
     return await this.doctorRepository.findOneBy({ id });
+  }
+
+  async updateById(id: number, payload: Partial<Doctor>): Promise<Doctor> {
+    await this.doctorRepository.update(id, payload);
+    const doctor = await this.doctorRepository.findOneBy({ id });
+    if (!doctor) {
+      throw new NotFoundException('Doctor not found');
+    }
+    return doctor;
   }
 }

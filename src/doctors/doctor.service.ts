@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { HospitalRepoService } from '../hospitals/repo/hospital/hospital-repo.service';
 import { CreateDoctorReq, CreateDoctorRes } from './dto/create-doctor.dto';
+import { UpdateDoctorReq, UpdateDoctorRes } from './dto/update-doctor.dto';
 import {
   ViewDoctorRes,
   ViewDoctorsReq,
   ViewDoctorsRes,
 } from './dto/view-doctor.dto';
+import { Doctor } from './entities/doctor.entity';
 import { DoctorRepoService } from './repo/doctor/doctor-repo.service';
 import { LanguageRepoService } from './repo/language/language-repo.service';
 import { SpecializationRepoService } from './repo/specialization/specialization-repo.service';
@@ -74,6 +76,43 @@ export class DoctorService {
     }
     return {
       message: 'Doctor fetched successfully',
+      data: {
+        id: doctor.id,
+        fullName: doctor.fullName,
+        experienceStartYear: doctor.experienceStartYear,
+        specializations: doctor.specializations.map((s) => s.name),
+        spokenLangauges: doctor.spokenLangauges.map((s) => s.name),
+      },
+    };
+  }
+
+  async updateDoctor(
+    doctorId: number,
+    payload: UpdateDoctorReq,
+  ): Promise<UpdateDoctorRes> {
+    const specializations = payload.specializations
+      ? await this.specializationRepoService.findElseCreate(
+          payload.specializations,
+        )
+      : undefined;
+    const languages = payload.spokenLangauges
+      ? await this.languageRepoService.findElseCreate(payload.spokenLangauges)
+      : undefined;
+    const updatePayload: Partial<Doctor> = {
+      ...(payload.fullName !== undefined && { fullName: payload.fullName }),
+      ...(payload.experienceStartYear !== undefined && {
+        experienceStartYear: payload.experienceStartYear,
+      }),
+      ...(specializations !== undefined && { specializations }),
+      ...(languages !== undefined && { spokenLangauges: languages }),
+    };
+
+    const doctor = await this.doctorRepoService.updateById(
+      doctorId,
+      updatePayload,
+    );
+    return {
+      message: 'Doctor updated successfully',
       data: {
         id: doctor.id,
         fullName: doctor.fullName,
