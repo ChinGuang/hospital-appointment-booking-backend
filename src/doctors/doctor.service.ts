@@ -57,7 +57,10 @@ export class DoctorService {
   async viewDoctors(queries: ViewDoctorsReq): Promise<ViewDoctorsRes> {
     const page = queries.page || 1;
     const limit = queries.limit || 10;
-    const doctors = await this.doctorRepoService.find({ page, limit });
+    const doctors = await this.doctorRepoService.find(
+      { page, limit },
+      queries.hospitalId,
+    );
     return {
       message: 'Doctors fetched successfully',
       data: doctors.map((doctor) => ({
