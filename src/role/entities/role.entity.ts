@@ -2,6 +2,7 @@ import {
   Column,
   Entity,
   Index,
+  JoinTable,
   ManyToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -17,5 +18,6 @@ export class Role {
   name: string;
 
   @ManyToMany(() => Permission, { eager: true })
+  @JoinTable()
   permissions: Permission[];
 }

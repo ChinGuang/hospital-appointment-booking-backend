@@ -36,8 +36,8 @@ export class StaffService {
       throw new NotFoundException('Hospital not found');
     }
     await this.staffRepoService.createStaff({
-      ...payload,
       userId: user.id,
+      user: user,
       hospital,
       role,
     });

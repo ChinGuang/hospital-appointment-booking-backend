@@ -4,7 +4,7 @@ import { HospitalZodType } from './base.dto';
 
 export const UpdateHospitalReqZodType = HospitalZodType.pick({
   name: true,
-});
+}).partial();
 
 export type UpdateHospitalReq = z.infer<typeof UpdateHospitalReqZodType>;
 

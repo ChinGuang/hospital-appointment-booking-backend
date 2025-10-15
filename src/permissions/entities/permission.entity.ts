@@ -6,6 +6,6 @@ export class Permission {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'enum', enum: PermissionType })
+  @Column({ type: 'enum', enum: PermissionType, unique: true })
   type: PermissionType;
 }

@@ -28,13 +28,13 @@ export class StaffController {
   @UsePipes(new ZodValidationPipe(CreateStaffReqZodType))
   @Post()
   async createStaff(
-    @Req() request: unknown,
+    @Req() request: Request & { staff?: Staff },
     @Body() payload: CreateStaffReq,
   ): Promise<CreateStaffRes> {
-    if (!request || typeof request !== 'object' || !request['staff']) {
+    if (!request?.staff) {
       throw new ForbiddenException('Access denied: Staff only');
     }
-    const hospitalId = (request['staff'] as Staff).hospital.id;
+    const hospitalId = request.staff.hospital.id;
     return this.staffService.createStaff(payload, hospitalId);
   }
 }

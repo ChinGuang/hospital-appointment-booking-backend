@@ -13,7 +13,7 @@ export class RoleService {
     private readonly permissionRepoService: PermissionRepoService,
   ) {}
 
-  async getDefaultStaffRole() {
+  async getDefaultStaffRole(): Promise<Role> {
     const defaultName = 'Default Admin Staff';
     const defaultStaffRole = await this.roleRepository.findOne({
       where: {
@@ -25,10 +25,17 @@ export class RoleService {
       const permission = await this.permissionRepoService.getIfExistOrCreate(
         PermissionType.ALL,
       );
-      return await this.roleRepository.save({
-        name: defaultName,
-        permissions: [permission],
-      });
+      try {
+        return await this.roleRepository.save({
+          name: defaultName,
+          permissions: [permission],
+        });
+      } catch {
+        // Handle unique violation -> fetch the just-created role
+        return (await this.roleRepository.findOne({
+          where: { name: defaultName },
+        }))!;
+      }
     }
     return defaultStaffRole;
   }

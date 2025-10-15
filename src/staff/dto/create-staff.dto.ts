@@ -3,8 +3,8 @@ import { BaseResponseZodType } from '../../common/interface';
 import { UserType } from '../../users/enums/user.enum';
 
 export const CreateStaffReqZodType = z.object({
-  username: z.string(),
-  email: z.string(),
+  username: z.string().trim(),
+  email: z.email().trim(),
   password: z.string(),
   roleId: z.number(),
 });

@@ -69,6 +69,7 @@ export class HospitalService {
     const defaultRole = await this.roleService.getDefaultStaffRole();
     await this.staffService.createStaff({
       userId: adminStaff.id,
+      user: adminStaff,
       hospital,
       role: defaultRole,
     });

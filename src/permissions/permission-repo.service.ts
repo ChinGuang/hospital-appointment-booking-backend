@@ -19,8 +19,20 @@ export class PermissionRepoService {
     if (permission) {
       return permission;
     }
-    return this.permissionRepository.save({
-      type: permissionType,
-    });
+    try {
+      return await this.permissionRepository.save({
+        type: permissionType,
+      });
+    } catch (error) {
+      // If duplicate key error (e.g., unique constraint violation),
+      // retry the lookup as another concurrent request may have created it
+      const retryPermission = await this.permissionRepository.findOneBy({
+        type: permissionType,
+      });
+      if (retryPermission) {
+        return retryPermission;
+      }
+      throw error;
+    }
   }
 }
