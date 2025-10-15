@@ -3,8 +3,10 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { Hospital } from '../../hospitals/repo/entities/hospital.entity';
 import { Language } from './language.entity';
 import { Specialization } from './specialization.entity';
 
@@ -19,11 +21,14 @@ export class Doctor {
   @Column({ type: 'int' })
   experienceStartYear: number;
 
-  @ManyToMany(() => Specialization)
+  @ManyToMany(() => Specialization, { cascade: true })
   @JoinTable()
   specializations: Specialization[];
 
-  @ManyToMany(() => Language)
+  @ManyToMany(() => Language, { cascade: true })
   @JoinTable()
   spokenLangauges: Language[];
+
+  @ManyToOne(() => Hospital, { eager: true })
+  hospital: Hospital;
 }
