@@ -5,6 +5,7 @@ import { RoleService } from '../role/role.service';
 import { UserType } from '../users/enums/user.enum';
 import { UserService } from '../users/user.service';
 import { CreateStaffReq, CreateStaffRes } from './dto/create-staff.dto';
+import { ViewStaffByIdRes } from './dto/view-staff.dto';
 import { StaffRepoService } from './repo/staff-repo.service';
 
 @Injectable()
@@ -49,6 +50,23 @@ export class StaffService {
         email: user.email,
         userType: user.userType,
         hospitalId: hospital.id,
+      },
+    };
+  }
+
+  async viewStaff(id: number, hospitalId: number): Promise<ViewStaffByIdRes> {
+    const staff = await this.staffRepoService.getStaffByUserId(id);
+    if (!staff || staff.hospital.id !== hospitalId) {
+      throw new NotFoundException('Staff not found');
+    }
+    return {
+      message: 'Staff found successfully',
+      data: {
+        id: staff.userId,
+        username: staff.user.username,
+        email: staff.user.email,
+        userType: staff.user.userType,
+        hospitalId: staff.hospital.id,
       },
     };
   }

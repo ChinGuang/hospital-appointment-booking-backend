@@ -2,6 +2,9 @@ import {
   Body,
   Controller,
   ForbiddenException,
+  Get,
+  Param,
+  ParseIntPipe,
   Post,
   Req,
   UseGuards,
@@ -16,6 +19,7 @@ import {
   CreateStaffReqZodType,
   CreateStaffRes,
 } from './dto/create-staff.dto';
+import { ViewStaffByIdRes } from './dto/view-staff.dto';
 import { Staff } from './entities/staff.entity';
 import { StaffService } from './staff.service';
 
@@ -37,4 +41,24 @@ export class StaffController {
     const hospitalId = request.staff.hospital.id;
     return this.staffService.createStaff(payload, hospitalId);
   }
+
+  @Permissions([PermissionType.VIEW_STAFF])
+  @UseGuards(PermissionGuard)
+  @Get(':id')
+  async viewStaff(
+    @Req() request: Request & { staff?: Staff },
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ViewStaffByIdRes> {
+    if (!request?.staff) {
+      throw new ForbiddenException('Access denied: Staff only');
+    }
+    const hospitalId = request.staff.hospital.id;
+    return this.staffService.viewStaff(id, hospitalId);
+  }
+
+  //View staffs
+
+  //Delete staff
+
+  //Update staff
 }
