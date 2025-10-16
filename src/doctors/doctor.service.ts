@@ -17,7 +17,7 @@ import { Doctor } from './entities/doctor.entity';
 import { DoctorRepoService } from './repo/doctor/doctor-repo.service';
 import { LanguageRepoService } from './repo/language/language-repo.service';
 import { SpecializationRepoService } from './repo/specialization/specialization-repo.service';
-import { WorkingScheduleRepoService } from './repo/working-schedule.ts/working-schedule-repo.service';
+import { WorkingScheduleRepoService } from './repo/working-schedule/working-schedule-repo.service';
 
 @Injectable()
 export class DoctorService {

@@ -2,7 +2,7 @@ import {
   Column,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Doctor } from './doctor.entity';
@@ -12,7 +12,7 @@ export class WorkingSchedule {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => Doctor, { eager: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => Doctor, { eager: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'doctorId', referencedColumnName: 'id' })
   doctor: Doctor;
 

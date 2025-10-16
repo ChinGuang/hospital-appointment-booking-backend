@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { BaseResponseZodType } from '../../common/interface';
-export const UpdateDoctorWorkingScheduleReq = z.object({
+export const UpdateDoctorWorkingScheduleReqZodType = z.object({
   workingSchedule: z.array(
     z.object({
       dayOfWeek: z.number().min(0).max(6),
@@ -11,19 +11,21 @@ export const UpdateDoctorWorkingScheduleReq = z.object({
 });
 
 export type UpdateDoctorWorkingScheduleReq = z.infer<
-  typeof UpdateDoctorWorkingScheduleReq
+  typeof UpdateDoctorWorkingScheduleReqZodType
 >;
 
-export const UpdateDoctorWorkingScheduleRes = BaseResponseZodType.extend({
-  data: z.array(
-    z.object({
-      dayOfWeek: z.number().min(0).max(6),
-      startTime: z.string(),
-      endTime: z.string(),
-    }),
-  ),
-});
+export const UpdateDoctorWorkingScheduleResZodType = BaseResponseZodType.extend(
+  {
+    data: z.array(
+      z.object({
+        dayOfWeek: z.number().min(0).max(6),
+        startTime: z.string(),
+        endTime: z.string(),
+      }),
+    ),
+  },
+);
 
 export type UpdateDoctorWorkingScheduleRes = z.infer<
-  typeof UpdateDoctorWorkingScheduleRes
+  typeof UpdateDoctorWorkingScheduleResZodType
 >;

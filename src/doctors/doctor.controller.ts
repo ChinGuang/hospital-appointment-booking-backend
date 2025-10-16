@@ -27,7 +27,8 @@ import {
 } from './dto/create-doctor.dto';
 import { DeleteDoctorRes } from './dto/delete-doctor.dto';
 import {
-  UpdateDoctorWorkingScheduleReq,
+  type UpdateDoctorWorkingScheduleReq,
+  UpdateDoctorWorkingScheduleReqZodType,
   UpdateDoctorWorkingScheduleRes,
 } from './dto/update-doctor-working-schedule.dto';
 import {
@@ -86,7 +87,10 @@ export class DoctorController {
     return await this.doctorService.updateDoctor(id, body);
   }
 
+  @Permissions([PermissionType.UPDATE_DOCTOR])
+  @UseGuards(PermissionGuard)
   @Put('doctors/:id/working-schedule')
+  @UsePipes(new ZodValidationPipe(UpdateDoctorWorkingScheduleReqZodType))
   async updateDoctorWorkingSchedule(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateDoctorWorkingScheduleReq,
