@@ -10,26 +10,6 @@ export class AppointmentSlotsRepoService {
     private readonly appointmentSlotRepository: Repository<AppointmentSlot>,
   ) {}
 
-  async deleteByDoctorIdWithinTransaction(
-    doctorId: number,
-    manager: EntityManager,
-  ): Promise<AppointmentSlot[]> {
-    const appointmentSlots = await this.findByDoctorIdWithinTransaction(
-      doctorId,
-      manager,
-    );
-    return await manager.remove(AppointmentSlot, appointmentSlots);
-  }
-
-  async findByDoctorIdWithinTransaction(
-    doctorId: number,
-    manager: EntityManager,
-  ): Promise<AppointmentSlot[]> {
-    return await manager.find(AppointmentSlot, {
-      where: { doctor: { id: doctorId } },
-    });
-  }
-
   async createWithinTransaction(
     payload: Omit<AppointmentSlot, 'doctor' | 'id'>[],
     doctorId: number,
@@ -42,5 +22,31 @@ export class AppointmentSlotsRepoService {
         ...p,
       })),
     );
+  }
+
+  async findByDoctorId(doctorId: number): Promise<AppointmentSlot[]> {
+    return await this.appointmentSlotRepository.find({
+      where: { doctor: { id: doctorId } },
+    });
+  }
+
+  async findByDoctorIdWithinTransaction(
+    doctorId: number,
+    manager: EntityManager,
+  ): Promise<AppointmentSlot[]> {
+    return await manager.find(AppointmentSlot, {
+      where: { doctor: { id: doctorId } },
+    });
+  }
+
+  async deleteByDoctorIdWithinTransaction(
+    doctorId: number,
+    manager: EntityManager,
+  ): Promise<AppointmentSlot[]> {
+    const appointmentSlots = await this.findByDoctorIdWithinTransaction(
+      doctorId,
+      manager,
+    );
+    return await manager.remove(AppointmentSlot, appointmentSlots);
   }
 }

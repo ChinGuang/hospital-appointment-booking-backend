@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   ForbiddenException,
+  Get,
   Param,
   ParseIntPipe,
   Put,
@@ -15,6 +16,7 @@ import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { PermissionType } from '../permissions/enums/permission.enum';
 import { Staff } from '../staffs/entities/staff.entity';
 import { AppointmentSlotsService } from './appointment-slots.service';
+import { GetDoctorAppointmentSlotsRes } from './dto/get-appointment-slot.dto';
 import {
   type UpdateAppointmentSlotReq,
   UpdateAppointmentSlotReqZodType,
@@ -27,14 +29,23 @@ export class AppointmentSlotController {
     private readonly appointmentSlotService: AppointmentSlotsService,
   ) {}
 
-  // View doctor's appointment slots
+  @Get('/:doctorId')
+  async getDoctorAppointmentSlots(
+    @Param('doctorId', ParseIntPipe) doctorId: number,
+  ): Promise<GetDoctorAppointmentSlotsRes> {
+    return await this.appointmentSlotService.readDoctorAppointmentSlots(
+      doctorId,
+    );
+  }
+
+  // View appointment slots
 
   @Permissions([PermissionType.UPDATE_DOCTOR])
   @UseGuards(PermissionGuard)
   @UsePipes(new ZodValidationPipe(UpdateAppointmentSlotReqZodType))
-  @Put('/:id')
+  @Put('/:doctorId')
   async updateDoctorAppointmentSlots(
-    @Param('id', ParseIntPipe) doctorId: number,
+    @Param('doctorId', ParseIntPipe) doctorId: number,
     @Body() body: UpdateAppointmentSlotReq,
     @Req() req: Request & { staff?: Staff },
   ): Promise<UpdateAppointmentSlotRes> {
