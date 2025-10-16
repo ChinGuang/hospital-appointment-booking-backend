@@ -5,6 +5,7 @@ import { RoleService } from '../role/role.service';
 import { UserType } from '../users/enums/user.enum';
 import { UserService } from '../users/user.service';
 import { CreateStaffReq, CreateStaffRes } from './dto/create-staff.dto';
+import { UpdateStaffReq, UpdateStaffRes } from './dto/update-staff.dto';
 import {
   ViewStaffByIdRes,
   ViewStaffsReq,
@@ -95,6 +96,32 @@ export class StaffService {
         userType: staff.user.userType,
         hospitalId: staff.hospital.id,
       })),
+    };
+  }
+
+  async updateStaff(
+    id: number,
+    hospitalId: number,
+    payload: UpdateStaffReq,
+  ): Promise<UpdateStaffRes> {
+    const staff = await this.staffRepoService.getStaffByUserId(id);
+    if (!staff || staff.hospital.id !== hospitalId) {
+      throw new NotFoundException('Staff not found');
+    }
+    const role = await this.roleService.getRoleById(payload.roleId);
+    if (!role) {
+      throw new NotFoundException('Role not found');
+    }
+    const updatedStaff = await this.staffRepoService.updateStaff(id, role);
+    return {
+      message: 'Staff updated successfully',
+      data: {
+        id: updatedStaff.userId,
+        username: updatedStaff.user.username,
+        email: updatedStaff.user.email,
+        userType: updatedStaff.user.userType,
+        hospitalId: updatedStaff.hospital.id,
+      },
     };
   }
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Role } from '../../role/entities/role.entity';
 import { Staff } from '../entities/staff.entity';
 
 @Injectable()
@@ -46,5 +47,9 @@ export class StaffRepoService {
       .skip((page - 1) * limit)
       .take(limit);
     return queryBuilder.getMany();
+  }
+
+  async updateStaff(id: number, role: Role): Promise<Staff> {
+    return this.staffRepository.save({ id, role });
   }
 }

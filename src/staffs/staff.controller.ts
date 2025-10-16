@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -20,6 +21,11 @@ import {
   CreateStaffReqZodType,
   CreateStaffRes,
 } from './dto/create-staff.dto';
+import {
+  type UpdateStaffReq,
+  UpdateStaffReqZodType,
+  UpdateStaffRes,
+} from './dto/update-staff.dto';
 import {
   ViewStaffByIdRes,
   type ViewStaffsReq,
@@ -79,5 +85,19 @@ export class StaffController {
 
   //Delete staff
 
-  //Update staff
+  @Permissions([PermissionType.UPDATE_STAFF])
+  @UseGuards(PermissionGuard)
+  @UsePipes(new ZodValidationPipe(UpdateStaffReqZodType))
+  @Put(':id')
+  async updateStaff(
+    @Req() request: Request & { staff?: Staff },
+    @Param('id', ParseIntPipe) id: number,
+    @Body() payload: UpdateStaffReq,
+  ): Promise<UpdateStaffRes> {
+    if (!request?.staff) {
+      throw new ForbiddenException('Access denied: Staff only');
+    }
+    const hospitalId = request.staff.hospital.id;
+    return this.staffService.updateStaff(id, hospitalId, payload);
+  }
 }
