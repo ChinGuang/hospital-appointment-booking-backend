@@ -1,7 +1,7 @@
 import {
-    CanActivate,
-    ExecutionContext,
-    ForbiddenException,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { PermissionType } from 'src/permissions/enums/permission.enum';

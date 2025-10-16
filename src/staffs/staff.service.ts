@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 import { Argon2Utils } from '../common/utils/argon2';
 import { HospitalRepoService } from '../hospitals/repo/hospital/hospital-repo.service';
 import { RoleService } from '../role/role.service';
@@ -21,6 +22,7 @@ export class StaffService {
     private readonly staffRepoService: StaffRepoService,
     private readonly roleService: RoleService,
     private readonly hospitalRepoService: HospitalRepoService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async createStaff(
@@ -36,26 +38,35 @@ export class StaffService {
       throw new NotFoundException('Hospital not found');
     }
     const hashedPassword = await Argon2Utils.hashPassword(payload.password);
-    const user = await this.userService.createUser({
-      username: payload.username,
-      email: payload.email,
-      password: hashedPassword,
-      userType: UserType.STAFF,
-    });
-    await this.staffRepoService.createStaff({
-      userId: user.id,
-      user: user,
-      hospital,
-      role,
+    const staffAfterTrx = await this.dataSource.transaction(async (manager) => {
+      const user = await this.userService.createUserWithinTransaction(
+        {
+          username: payload.username,
+          email: payload.email,
+          password: hashedPassword,
+          userType: UserType.STAFF,
+        },
+        manager,
+      );
+      const staff = await this.staffRepoService.createStaffWithinTransaction(
+        {
+          userId: user.id,
+          user: user,
+          hospital,
+          role,
+        },
+        manager,
+      );
+      return staff;
     });
     return {
       message: 'Staff created successfully',
       data: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        userType: user.userType,
-        hospitalId: hospital.id,
+        id: staffAfterTrx.userId,
+        username: staffAfterTrx.user.username,
+        email: staffAfterTrx.user.email,
+        userType: staffAfterTrx.user.userType,
+        hospitalId: staffAfterTrx.hospital.id,
       },
     };
   }

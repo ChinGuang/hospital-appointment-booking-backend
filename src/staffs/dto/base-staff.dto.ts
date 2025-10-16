@@ -1,10 +1,10 @@
-import z from 'zod';
+import { z } from 'zod';
 import { UserType } from '../../users/enums/user.enum';
 
 export const StaffZodType = z.object({
   id: z.number(),
   username: z.string(),
-  email: z.string(),
+  email: z.email(),
   userType: z.enum(UserType),
   hospitalId: z.number(),
 });

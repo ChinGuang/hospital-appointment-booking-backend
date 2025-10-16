@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 import { BaseResponseZodType } from '../../common/interface';
 import { StaffZodType } from './base-staff.dto';
 

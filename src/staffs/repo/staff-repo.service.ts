@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Role } from '../../role/entities/role.entity';
 import { Staff } from '../entities/staff.entity';
 
@@ -13,6 +13,13 @@ export class StaffRepoService {
 
   async createStaff(payload: Staff): Promise<Staff> {
     return this.staffRepository.save(payload);
+  }
+
+  async createStaffWithinTransaction(
+    payload: Staff,
+    manager: EntityManager,
+  ): Promise<Staff> {
+    return manager.getRepository(Staff).save(payload);
   }
 
   async getStaffByUserId(userId: number): Promise<Staff | null> {
@@ -33,7 +40,8 @@ export class StaffRepoService {
       .leftJoinAndSelect('staff.role', 'role')
       .leftJoinAndSelect('role.permissions', 'permissions')
       .leftJoinAndSelect('staff.user', 'user')
-      .where('staff.hospital.id = :hospitalId', { hospitalId });
+      .leftJoinAndSelect('staff.hospital', 'hospital')
+      .where('hospital.id = :hospitalId', { hospitalId });
 
     if (search) {
       queryBuilder.andWhere(
@@ -50,7 +58,15 @@ export class StaffRepoService {
   }
 
   async updateStaff(id: number, role: Role): Promise<Staff> {
-    return this.staffRepository.save({ id, role });
+    const staff = await this.staffRepository.findOne({
+      where: { userId: id },
+      relations: ['user', 'hospital', 'role', 'role.permissions'],
+    });
+    if (!staff) {
+      throw new NotFoundException('Staff not found');
+    }
+    staff.role = role;
+    return this.staffRepository.save(staff);
   }
 
   async deleteStaff(staff: Staff): Promise<Staff> {
