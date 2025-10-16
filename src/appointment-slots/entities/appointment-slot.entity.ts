@@ -12,7 +12,6 @@ export class AppointmentSlot {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
   @ManyToOne(() => Doctor, { eager: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'doctorId', referencedColumnName: 'id' })
   doctor: Doctor;
