@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   Req,
   UseGuards,
   UsePipes,
@@ -19,7 +20,12 @@ import {
   CreateStaffReqZodType,
   CreateStaffRes,
 } from './dto/create-staff.dto';
-import { ViewStaffByIdRes } from './dto/view-staff.dto';
+import {
+  ViewStaffByIdRes,
+  type ViewStaffsReq,
+  ViewStaffsReqZodType,
+  ViewStaffsRes,
+} from './dto/view-staff.dto';
 import { Staff } from './entities/staff.entity';
 import { StaffService } from './staff.service';
 
@@ -56,7 +62,20 @@ export class StaffController {
     return this.staffService.viewStaff(id, hospitalId);
   }
 
-  //View staffs
+  @Permissions([PermissionType.VIEW_STAFF])
+  @UseGuards(PermissionGuard)
+  @UsePipes(new ZodValidationPipe(ViewStaffsReqZodType))
+  @Get()
+  async viewStaffs(
+    @Req() request: Request & { staff?: Staff },
+    @Query() query: ViewStaffsReq,
+  ): Promise<ViewStaffsRes> {
+    if (!request?.staff) {
+      throw new ForbiddenException('Access denied: Staff only');
+    }
+    const hospitalId = request.staff.hospital.id;
+    return this.staffService.viewStaffs(query, hospitalId);
+  }
 
   //Delete staff
 

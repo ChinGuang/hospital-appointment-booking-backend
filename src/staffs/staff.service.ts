@@ -5,7 +5,11 @@ import { RoleService } from '../role/role.service';
 import { UserType } from '../users/enums/user.enum';
 import { UserService } from '../users/user.service';
 import { CreateStaffReq, CreateStaffRes } from './dto/create-staff.dto';
-import { ViewStaffByIdRes } from './dto/view-staff.dto';
+import {
+  ViewStaffByIdRes,
+  ViewStaffsReq,
+  ViewStaffsRes,
+} from './dto/view-staff.dto';
 import { StaffRepoService } from './repo/staff-repo.service';
 
 @Injectable()
@@ -68,6 +72,29 @@ export class StaffService {
         userType: staff.user.userType,
         hospitalId: staff.hospital.id,
       },
+    };
+  }
+
+  async viewStaffs(
+    query: ViewStaffsReq,
+    hospitalId: number,
+  ): Promise<ViewStaffsRes> {
+    const { page, limit, search } = query;
+    const staffs = await this.staffRepoService.getStaffsByHospitalId(
+      hospitalId,
+      page,
+      limit,
+      search,
+    );
+    return {
+      message: 'Staffs found successfully',
+      data: staffs.map((staff) => ({
+        id: staff.userId,
+        username: staff.user.username,
+        email: staff.user.email,
+        userType: staff.user.userType,
+        hospitalId: staff.hospital.id,
+      })),
     };
   }
 }
