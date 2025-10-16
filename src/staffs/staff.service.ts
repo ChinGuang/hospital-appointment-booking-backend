@@ -5,6 +5,7 @@ import { RoleService } from '../role/role.service';
 import { UserType } from '../users/enums/user.enum';
 import { UserService } from '../users/user.service';
 import { CreateStaffReq, CreateStaffRes } from './dto/create-staff.dto';
+import { DeleteStaffRes } from './dto/delete-staff.dto';
 import { UpdateStaffReq, UpdateStaffRes } from './dto/update-staff.dto';
 import {
   ViewStaffByIdRes,
@@ -121,6 +122,24 @@ export class StaffService {
         email: updatedStaff.user.email,
         userType: updatedStaff.user.userType,
         hospitalId: updatedStaff.hospital.id,
+      },
+    };
+  }
+
+  async deleteStaff(id: number, hospitalId: number): Promise<DeleteStaffRes> {
+    const staff = await this.staffRepoService.getStaffByUserId(id);
+    if (!staff || staff.hospital.id !== hospitalId) {
+      throw new NotFoundException('Staff not found');
+    }
+    const deletedStaff = await this.staffRepoService.deleteStaff(staff);
+    return {
+      message: 'Staff deleted successfully',
+      data: {
+        id: deletedStaff.userId,
+        username: deletedStaff.user.username,
+        email: deletedStaff.user.email,
+        userType: deletedStaff.user.userType,
+        hospitalId: deletedStaff.hospital.id,
       },
     };
   }

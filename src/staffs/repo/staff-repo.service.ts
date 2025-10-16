@@ -52,4 +52,8 @@ export class StaffRepoService {
   async updateStaff(id: number, role: Role): Promise<Staff> {
     return this.staffRepository.save({ id, role });
   }
+
+  async deleteStaff(staff: Staff): Promise<Staff> {
+    return this.staffRepository.remove(staff);
+  }
 }

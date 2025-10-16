@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   Param,
@@ -21,6 +22,7 @@ import {
   CreateStaffReqZodType,
   CreateStaffRes,
 } from './dto/create-staff.dto';
+import { DeleteStaffRes } from './dto/delete-staff.dto';
 import {
   type UpdateStaffReq,
   UpdateStaffReqZodType,
@@ -83,8 +85,6 @@ export class StaffController {
     return this.staffService.viewStaffs(query, hospitalId);
   }
 
-  //Delete staff
-
   @Permissions([PermissionType.UPDATE_STAFF])
   @UseGuards(PermissionGuard)
   @UsePipes(new ZodValidationPipe(UpdateStaffReqZodType))
@@ -99,5 +99,19 @@ export class StaffController {
     }
     const hospitalId = request.staff.hospital.id;
     return this.staffService.updateStaff(id, hospitalId, payload);
+  }
+
+  @Permissions([PermissionType.DELETE_STAFF])
+  @UseGuards(PermissionGuard)
+  @Delete(':id')
+  async deleteStaff(
+    @Req() request: Request & { staff?: Staff },
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<DeleteStaffRes> {
+    if (!request?.staff) {
+      throw new ForbiddenException('Access denied: Staff only');
+    }
+    const hospitalId = request.staff.hospital.id;
+    return this.staffService.deleteStaff(id, hospitalId);
   }
 }
