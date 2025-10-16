@@ -1,41 +1,41 @@
 import {
-  Body,
-  Controller,
-  Delete,
-  ForbiddenException,
-  Get,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  Query,
-  Req,
-  UseGuards,
-  UsePipes,
+    Body,
+    Controller,
+    Delete,
+    ForbiddenException,
+    Get,
+    Param,
+    ParseIntPipe,
+    Post,
+    Put,
+    Query,
+    Req,
+    UseGuards,
+    UsePipes,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { Permissions } from '../common/guards/permission/permission.decorator';
 import { PermissionGuard } from '../common/guards/permission/permission.guard';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { PermissionType } from '../permissions/enums/permission.enum';
-import { Staff } from '../staff/entities/staff.entity';
+import { Staff } from '../staffs/entities/staff.entity';
 import { DoctorService } from './doctor.service';
 import {
-  type CreateDoctorReq,
-  CreateDoctorReqZodType,
-  CreateDoctorRes,
+    type CreateDoctorReq,
+    CreateDoctorReqZodType,
+    CreateDoctorRes,
 } from './dto/create-doctor.dto';
 import { DeleteDoctorRes } from './dto/delete-doctor.dto';
 import {
-  type UpdateDoctorReq,
-  UpdateDoctorReqZodType,
-  UpdateDoctorRes,
+    type UpdateDoctorReq,
+    UpdateDoctorReqZodType,
+    UpdateDoctorRes,
 } from './dto/update-doctor.dto';
 import {
-  ViewDoctorRes,
-  type ViewDoctorsReq,
-  ViewDoctorsReqZodType,
-  ViewDoctorsRes,
+    ViewDoctorRes,
+    type ViewDoctorsReq,
+    ViewDoctorsReqZodType,
+    ViewDoctorsRes,
 } from './dto/view-doctor.dto';
 
 @Controller()

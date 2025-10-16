@@ -5,7 +5,7 @@ import { DataSource } from 'typeorm';
 import { AuthModule } from './auth/auth.module';
 import { DoctorModule } from './doctors/doctor.module';
 import { HospitalModule } from './hospitals/hospital.module';
-import { StaffModule } from './staff/staff.module';
+import { StaffModule } from './staffs/staff.module';
 
 @Module({
   imports: [
