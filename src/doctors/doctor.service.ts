@@ -58,6 +58,7 @@ export class DoctorService {
         experienceStartYear: doctor.experienceStartYear,
         specializations: doctor.specializations.map((s) => s.name),
         spokenLanguages: doctor.spokenLanguages.map((s) => s.name),
+        workingSchedule: [],
       },
     };
   }
@@ -69,6 +70,12 @@ export class DoctorService {
       { page, limit },
       queries.hospitalId,
     );
+
+    const workingSchedules =
+      await this.workingScheduleRepoService.findByDoctorIds(
+        doctors.map((doctor) => doctor.id),
+      );
+
     return {
       message: 'Doctors fetched successfully',
       data: doctors.map((doctor) => ({
@@ -77,6 +84,9 @@ export class DoctorService {
         experienceStartYear: doctor.experienceStartYear,
         specializations: doctor.specializations.map((s) => s.name),
         spokenLanguages: doctor.spokenLanguages.map((s) => s.name),
+        workingSchedule: workingSchedules.filter(
+          (workingSchedule) => workingSchedule.doctor.id === doctor.id,
+        ),
       })),
     };
   }
@@ -86,6 +96,8 @@ export class DoctorService {
     if (!doctor) {
       throw new NotFoundException('Doctor not found');
     }
+    const workingSchedule =
+      await this.workingScheduleRepoService.findByDoctorId(doctorId);
     return {
       message: 'Doctor fetched successfully',
       data: {
@@ -94,6 +106,7 @@ export class DoctorService {
         experienceStartYear: doctor.experienceStartYear,
         specializations: doctor.specializations.map((s) => s.name),
         spokenLanguages: doctor.spokenLanguages.map((s) => s.name),
+        workingSchedule,
       },
     };
   }
@@ -123,6 +136,8 @@ export class DoctorService {
       doctorId,
       updatePayload,
     );
+    const workingSchedule =
+      await this.workingScheduleRepoService.findByDoctorId(doctorId);
     return {
       message: 'Doctor updated successfully',
       data: {
@@ -131,6 +146,7 @@ export class DoctorService {
         experienceStartYear: doctor.experienceStartYear,
         specializations: doctor.specializations.map((s) => s.name),
         spokenLanguages: doctor.spokenLanguages.map((s) => s.name),
+        workingSchedule,
       },
     };
   }
@@ -145,7 +161,7 @@ export class DoctorService {
     }
     const workingSchedules = await this.dataSource.transaction(
       async (manager) => {
-        await this.workingScheduleRepoService.deleteByDoctorId(
+        await this.workingScheduleRepoService.deleteByDoctorIdWithinTransaction(
           doctorId,
           manager,
         );
@@ -164,6 +180,8 @@ export class DoctorService {
 
   async deleteDoctor(doctorId: number): Promise<DeleteDoctorRes> {
     const doctor = await this.doctorRepoService.deleteById(doctorId);
+    const workingSchedule =
+      await this.workingScheduleRepoService.findByDoctorId(doctorId);
     return {
       message: 'Doctor deleted successfully',
       data: {
@@ -172,6 +190,7 @@ export class DoctorService {
         experienceStartYear: doctor.experienceStartYear,
         specializations: doctor.specializations.map((s) => s.name),
         spokenLanguages: doctor.spokenLanguages.map((s) => s.name),
+        workingSchedule,
       },
     };
   }

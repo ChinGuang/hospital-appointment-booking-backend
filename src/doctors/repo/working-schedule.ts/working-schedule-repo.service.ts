@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import { WorkingSchedule } from '../../entities/working-schedule.entity';
 
 @Injectable()
@@ -9,13 +9,6 @@ export class WorkingScheduleRepoService {
     @InjectRepository(WorkingSchedule)
     private readonly workingScheduleRepository: Repository<WorkingSchedule>,
   ) {}
-
-  async deleteByDoctorId(
-    doctorId: number,
-    manager: EntityManager,
-  ): Promise<void> {
-    await manager.delete(WorkingSchedule, { doctorId });
-  }
 
   async create(
     payload: Omit<WorkingSchedule, 'doctor' | 'id'>[],
@@ -29,5 +22,32 @@ export class WorkingScheduleRepoService {
         ...p,
       })),
     );
+  }
+
+  async findByDoctorId(doctorId: number): Promise<WorkingSchedule[]> {
+    return await this.workingScheduleRepository.find({
+      where: { doctor: { id: doctorId } },
+    });
+  }
+
+  async findByDoctorIds(doctorIds: number[]): Promise<WorkingSchedule[]> {
+    return await this.workingScheduleRepository.find({
+      where: { doctor: { id: In(doctorIds) } },
+    });
+  }
+
+  async deleteByDoctorId(doctorId: number): Promise<WorkingSchedule[]> {
+    const workingSchedules = await this.findByDoctorId(doctorId);
+
+    return await this.workingScheduleRepository.remove(workingSchedules);
+  }
+
+  async deleteByDoctorIdWithinTransaction(
+    doctorId: number,
+    manager: EntityManager,
+  ): Promise<WorkingSchedule[]> {
+    const workingSchedules = await this.findByDoctorId(doctorId);
+
+    return await manager.remove(WorkingSchedule, workingSchedules);
   }
 }
