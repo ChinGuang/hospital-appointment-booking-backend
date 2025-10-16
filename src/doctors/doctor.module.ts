@@ -5,6 +5,7 @@ import { DoctorService } from './doctor.service';
 import { DoctorRepoModule } from './repo/doctor/doctor-repo.module';
 import { LanguageRepoModule } from './repo/language/language-repo.module';
 import { SpecializationRepoModule } from './repo/specialization/specialization-repo.module';
+import { WorkingScheduleRepoModule } from './repo/working-schedule/working-schedule-repo.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { SpecializationRepoModule } from './repo/specialization/specialization-r
     LanguageRepoModule,
     SpecializationRepoModule,
     HospitalRepoModule,
+    WorkingScheduleRepoModule,
   ],
   providers: [DoctorService],
   controllers: [DoctorController],

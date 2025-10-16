@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 import { BaseResponseZodType } from '../../common/interface';
 
 export const RefreshTokenResZodType = BaseResponseZodType.extend({

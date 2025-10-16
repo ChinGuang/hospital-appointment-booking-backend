@@ -1,5 +1,5 @@
 import { BaseResponseZodType } from 'src/common/interface';
-import z from 'zod';
+import { z } from 'zod';
 import { HospitalZodType } from './base.dto';
 
 export const CreateHospitalReqZodType = z.object({

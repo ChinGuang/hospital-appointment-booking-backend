@@ -27,6 +27,11 @@ import {
 } from './dto/create-doctor.dto';
 import { DeleteDoctorRes } from './dto/delete-doctor.dto';
 import {
+  type UpdateDoctorWorkingScheduleReq,
+  UpdateDoctorWorkingScheduleReqZodType,
+  UpdateDoctorWorkingScheduleRes,
+} from './dto/update-doctor-working-schedule.dto';
+import {
   type UpdateDoctorReq,
   UpdateDoctorReqZodType,
   UpdateDoctorRes,
@@ -80,6 +85,17 @@ export class DoctorController {
     @Body() body: UpdateDoctorReq,
   ): Promise<UpdateDoctorRes> {
     return await this.doctorService.updateDoctor(id, body);
+  }
+
+  @Permissions([PermissionType.UPDATE_DOCTOR])
+  @UseGuards(PermissionGuard)
+  @Put('doctors/:id/working-schedule')
+  @UsePipes(new ZodValidationPipe(UpdateDoctorWorkingScheduleReqZodType))
+  async updateDoctorWorkingSchedule(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateDoctorWorkingScheduleReq,
+  ): Promise<UpdateDoctorWorkingScheduleRes> {
+    return await this.doctorService.updateDoctorWorkingSchedule(id, body);
   }
 
   @Permissions([PermissionType.DELETE_DOCTOR])
