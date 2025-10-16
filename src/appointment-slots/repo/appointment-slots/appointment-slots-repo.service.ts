@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EntityManager, Repository } from 'typeorm';
+import { GetAppointmentSlotsReq } from '../../dto/get-appointment-slot.dto';
 import { AppointmentSlot } from '../../entities/appointment-slot.entity';
 
 @Injectable()
@@ -22,6 +23,31 @@ export class AppointmentSlotsRepoService {
         ...p,
       })),
     );
+  }
+
+  async find(payload: GetAppointmentSlotsReq): Promise<AppointmentSlot[]> {
+    const page = payload.page || 1;
+    const limit = payload.limit || 10;
+    const offset = (page - 1) * limit;
+    const where = {};
+    const whereDoctor = {};
+    if (payload.doctorId) {
+      whereDoctor['id'] = payload.doctorId;
+    }
+    if (payload.dayOfWeek) {
+      where['dayOfWeek'] = payload.dayOfWeek;
+    }
+    if (payload.hospitalId) {
+      whereDoctor['hospital'] = { id: payload.hospitalId };
+    }
+    if (Object.keys(whereDoctor).length > 0) {
+      where['doctor'] = whereDoctor;
+    }
+    return await this.appointmentSlotRepository.find({
+      where,
+      take: limit,
+      skip: offset,
+    });
   }
 
   async findByDoctorId(doctorId: number): Promise<AppointmentSlot[]> {

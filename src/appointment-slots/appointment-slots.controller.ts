@@ -6,6 +6,7 @@ import {
   Param,
   ParseIntPipe,
   Put,
+  Query,
   Req,
   UseGuards,
   UsePipes,
@@ -16,7 +17,12 @@ import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { PermissionType } from '../permissions/enums/permission.enum';
 import { Staff } from '../staffs/entities/staff.entity';
 import { AppointmentSlotsService } from './appointment-slots.service';
-import { GetDoctorAppointmentSlotsRes } from './dto/get-appointment-slot.dto';
+import {
+  type GetAppointmentSlotsReq,
+  GetAppointmentSlotsReqZodType,
+  GetAppointmentSlotsRes,
+  GetDoctorAppointmentSlotsRes,
+} from './dto/get-appointment-slot.dto';
 import {
   type UpdateAppointmentSlotReq,
   UpdateAppointmentSlotReqZodType,
@@ -38,7 +44,13 @@ export class AppointmentSlotController {
     );
   }
 
-  // View appointment slots
+  @Get()
+  async getAppointmentSlots(
+    @Query(new ZodValidationPipe(GetAppointmentSlotsReqZodType))
+    query: GetAppointmentSlotsReq,
+  ): Promise<GetAppointmentSlotsRes> {
+    return await this.appointmentSlotService.readAppointmentSlots(query);
+  }
 
   @Permissions([PermissionType.UPDATE_DOCTOR])
   @UseGuards(PermissionGuard)

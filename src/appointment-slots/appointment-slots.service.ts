@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { DoctorRepoService } from '../doctors/repo/doctor/doctor-repo.service';
-import { GetDoctorAppointmentSlotsRes } from './dto/get-appointment-slot.dto';
+import {
+  GetAppointmentSlotsReq,
+  GetAppointmentSlotsRes,
+  GetDoctorAppointmentSlotsRes,
+} from './dto/get-appointment-slot.dto';
 import {
   UpdateAppointmentSlotReq,
   UpdateAppointmentSlotRes,
@@ -21,6 +25,16 @@ export class AppointmentSlotsService {
   ): Promise<GetDoctorAppointmentSlotsRes> {
     const slots =
       await this.appointmentSlotRepoService.findByDoctorId(doctorId);
+    return {
+      message: 'Appointment slots retrieved successfully',
+      data: slots,
+    };
+  }
+
+  async readAppointmentSlots(
+    payload: GetAppointmentSlotsReq,
+  ): Promise<GetAppointmentSlotsRes> {
+    const slots = await this.appointmentSlotRepoService.find(payload);
     return {
       message: 'Appointment slots retrieved successfully',
       data: slots,
