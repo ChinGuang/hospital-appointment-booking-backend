@@ -1,4 +1,5 @@
 import z from 'zod';
+import { ZodUtils } from '../../common/utils/zod';
 
 export const DoctorZodType = z.object({
   id: z.number(),
@@ -9,8 +10,8 @@ export const DoctorZodType = z.object({
   workingSchedule: z.array(
     z.object({
       dayOfWeek: z.number().min(0).max(6),
-      startTime: z.string(),
-      endTime: z.string(),
+      startTime: ZodUtils.TimeZodType,
+      endTime: ZodUtils.TimeZodType,
     }),
   ),
 });

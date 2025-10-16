@@ -1,5 +1,6 @@
 import z from 'zod';
 import { BaseResponseZodType } from '../../common/interface';
+import { ZodUtils } from '../../common/utils/zod';
 import { DoctorZodType } from './base-doctor.dto';
 
 export const ViewDoctorsReqZodType = z.object({
@@ -7,8 +8,8 @@ export const ViewDoctorsReqZodType = z.object({
   page: z.coerce.number().optional(),
   limit: z.coerce.number().optional(),
   dayOfWeeks: z.coerce.number().array().optional(),
-  startTime: z.string().optional(),
-  endTime: z.string().optional(),
+  startTime: ZodUtils.TimeZodType.optional(),
+  endTime: ZodUtils.TimeZodType.optional(),
 });
 
 export type ViewDoctorsReq = z.infer<typeof ViewDoctorsReqZodType>;

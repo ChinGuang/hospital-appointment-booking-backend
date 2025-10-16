@@ -30,6 +30,15 @@ export class WorkingScheduleRepoService {
     });
   }
 
+  async findByDoctorIdWithinTransaction(
+    doctorId: number,
+    manager: EntityManager,
+  ): Promise<WorkingSchedule[]> {
+    return await manager.find(WorkingSchedule, {
+      where: { doctor: { id: doctorId } },
+    });
+  }
+
   async findByDoctorIds(doctorIds: number[]): Promise<WorkingSchedule[]> {
     return await this.workingScheduleRepository.find({
       where: { doctor: { id: In(doctorIds) } },
@@ -46,7 +55,10 @@ export class WorkingScheduleRepoService {
     doctorId: number,
     manager: EntityManager,
   ): Promise<WorkingSchedule[]> {
-    const workingSchedules = await this.findByDoctorId(doctorId);
+    const workingSchedules = await this.findByDoctorIdWithinTransaction(
+      doctorId,
+      manager,
+    );
 
     return await manager.remove(WorkingSchedule, workingSchedules);
   }
