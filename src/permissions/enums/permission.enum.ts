@@ -7,4 +7,7 @@ export enum PermissionType {
   CREATE_DOCTOR = 6,
   UPDATE_DOCTOR = 7,
   DELETE_DOCTOR = 8,
+  VIEW_STAFF = 9,
+  UPDATE_STAFF = 10,
+  DELETE_STAFF = 11,
 }

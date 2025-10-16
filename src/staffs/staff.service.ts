@@ -1,0 +1,157 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { DataSource } from 'typeorm';
+import { Argon2Utils } from '../common/utils/argon2';
+import { HospitalRepoService } from '../hospitals/repo/hospital/hospital-repo.service';
+import { RoleService } from '../role/role.service';
+import { UserType } from '../users/enums/user.enum';
+import { UserService } from '../users/user.service';
+import { CreateStaffReq, CreateStaffRes } from './dto/create-staff.dto';
+import { DeleteStaffRes } from './dto/delete-staff.dto';
+import { UpdateStaffReq, UpdateStaffRes } from './dto/update-staff.dto';
+import {
+  ViewStaffByIdRes,
+  ViewStaffsReq,
+  ViewStaffsRes,
+} from './dto/view-staff.dto';
+import { StaffRepoService } from './repo/staff-repo.service';
+
+@Injectable()
+export class StaffService {
+  constructor(
+    private readonly userService: UserService,
+    private readonly staffRepoService: StaffRepoService,
+    private readonly roleService: RoleService,
+    private readonly hospitalRepoService: HospitalRepoService,
+    private readonly dataSource: DataSource,
+  ) {}
+
+  async createStaff(
+    payload: CreateStaffReq,
+    hospitalId: number,
+  ): Promise<CreateStaffRes> {
+    const role = await this.roleService.getRoleById(payload.roleId);
+    if (!role) {
+      throw new NotFoundException('Role not found');
+    }
+    const hospital = await this.hospitalRepoService.findById(hospitalId);
+    if (!hospital) {
+      throw new NotFoundException('Hospital not found');
+    }
+    const hashedPassword = await Argon2Utils.hashPassword(payload.password);
+    const staffAfterTrx = await this.dataSource.transaction(async (manager) => {
+      const user = await this.userService.createUserWithinTransaction(
+        {
+          username: payload.username,
+          email: payload.email,
+          password: hashedPassword,
+          userType: UserType.STAFF,
+        },
+        manager,
+      );
+      const staff = await this.staffRepoService.createStaffWithinTransaction(
+        {
+          userId: user.id,
+          user: user,
+          hospital,
+          role,
+        },
+        manager,
+      );
+      return staff;
+    });
+    return {
+      message: 'Staff created successfully',
+      data: {
+        id: staffAfterTrx.userId,
+        username: staffAfterTrx.user.username,
+        email: staffAfterTrx.user.email,
+        userType: staffAfterTrx.user.userType,
+        hospitalId: staffAfterTrx.hospital.id,
+      },
+    };
+  }
+
+  async viewStaff(id: number, hospitalId: number): Promise<ViewStaffByIdRes> {
+    const staff = await this.staffRepoService.getStaffByUserId(id);
+    if (!staff || staff.hospital.id !== hospitalId) {
+      throw new NotFoundException('Staff not found');
+    }
+    return {
+      message: 'Staff found successfully',
+      data: {
+        id: staff.userId,
+        username: staff.user.username,
+        email: staff.user.email,
+        userType: staff.user.userType,
+        hospitalId: staff.hospital.id,
+      },
+    };
+  }
+
+  async viewStaffs(
+    query: ViewStaffsReq,
+    hospitalId: number,
+  ): Promise<ViewStaffsRes> {
+    const { page, limit, search } = query;
+    const staffs = await this.staffRepoService.getStaffsByHospitalId(
+      hospitalId,
+      page,
+      limit,
+      search,
+    );
+    return {
+      message: 'Staffs found successfully',
+      data: staffs.map((staff) => ({
+        id: staff.userId,
+        username: staff.user.username,
+        email: staff.user.email,
+        userType: staff.user.userType,
+        hospitalId: staff.hospital.id,
+      })),
+    };
+  }
+
+  async updateStaff(
+    id: number,
+    hospitalId: number,
+    payload: UpdateStaffReq,
+  ): Promise<UpdateStaffRes> {
+    const staff = await this.staffRepoService.getStaffByUserId(id);
+    if (!staff || staff.hospital.id !== hospitalId) {
+      throw new NotFoundException('Staff not found');
+    }
+    const role = await this.roleService.getRoleById(payload.roleId);
+    if (!role) {
+      throw new NotFoundException('Role not found');
+    }
+    const updatedStaff = await this.staffRepoService.updateStaff(id, role);
+    return {
+      message: 'Staff updated successfully',
+      data: {
+        id: updatedStaff.userId,
+        username: updatedStaff.user.username,
+        email: updatedStaff.user.email,
+        userType: updatedStaff.user.userType,
+        hospitalId: updatedStaff.hospital.id,
+      },
+    };
+  }
+
+  async deleteStaff(id: number, hospitalId: number): Promise<DeleteStaffRes> {
+    const staff = await this.staffRepoService.getStaffByUserId(id);
+    if (!staff || staff.hospital.id !== hospitalId) {
+      throw new NotFoundException('Staff not found');
+    }
+    const deletedStaff = await this.staffRepoService.deleteStaff(staff);
+    return {
+      message: 'Staff deleted successfully',
+      data: {
+        id: deletedStaff.userId,
+        username: deletedStaff.user.username,
+        email: deletedStaff.user.email,
+        userType: deletedStaff.user.userType,
+        hospitalId: deletedStaff.hospital.id,
+      },
+    };
+  }
+}

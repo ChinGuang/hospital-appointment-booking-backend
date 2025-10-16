@@ -18,7 +18,7 @@ import { Permissions } from '../common/guards/permission/permission.decorator';
 import { PermissionGuard } from '../common/guards/permission/permission.guard';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { PermissionType } from '../permissions/enums/permission.enum';
-import { Staff } from '../staff/entities/staff.entity';
+import { Staff } from '../staffs/entities/staff.entity';
 import { DoctorService } from './doctor.service';
 import {
   type CreateDoctorReq,

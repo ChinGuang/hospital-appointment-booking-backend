@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Argon2Utils } from '../common/utils/argon2';
 import { RoleService } from '../role/role.service';
-import { StaffRepoService } from '../staff/repo/staff-repo.service';
+import { StaffRepoService } from '../staffs/repo/staff-repo.service';
 import { UserType } from '../users/enums/user.enum';
 import { UserService } from '../users/user.service';
 import {

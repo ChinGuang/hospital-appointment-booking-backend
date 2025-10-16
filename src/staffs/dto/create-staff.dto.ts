@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { BaseResponseZodType } from '../../common/interface';
-import { UserType } from '../../users/enums/user.enum';
+import { StaffZodType } from './base-staff.dto';
 
 export const CreateStaffReqZodType = z.object({
   username: z.string().trim(),
@@ -12,13 +12,7 @@ export const CreateStaffReqZodType = z.object({
 export type CreateStaffReq = z.infer<typeof CreateStaffReqZodType>;
 
 export const CreateStaffResZodType = BaseResponseZodType.extend({
-  data: z.object({
-    id: z.number(),
-    username: z.string(),
-    email: z.string(),
-    userType: z.enum(UserType),
-    hospitalId: z.number(),
-  }),
+  data: StaffZodType,
 });
 
 export type CreateStaffRes = z.infer<typeof CreateStaffResZodType>;
