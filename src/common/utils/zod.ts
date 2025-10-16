@@ -1,8 +1,9 @@
-import z from 'zod';
+import { z } from 'zod';
+import { RegexUtils } from './regex';
 
 const TimeZodType = z
   .string()
-  .regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Invalid time format (HH:mm)');
+  .regex(RegexUtils.timeRegex, 'Invalid time format (HH:mm)');
 
 export const ZodUtils = {
   TimeZodType,

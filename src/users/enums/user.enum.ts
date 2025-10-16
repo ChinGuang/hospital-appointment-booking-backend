@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 
 export enum UserType {
   ADMIN = 1,

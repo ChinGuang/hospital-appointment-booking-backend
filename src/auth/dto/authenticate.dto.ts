@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 import { UserTypeZodEnum } from '../../users/enums/user.enum';
 
 export const AuthenticateResZodType = z.object({

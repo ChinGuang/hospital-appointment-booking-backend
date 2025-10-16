@@ -1,4 +1,4 @@
-import z from 'zod';
+import { z } from 'zod';
 import { ZodUtils } from '../../common/utils/zod';
 
 export const DoctorZodType = z.object({
