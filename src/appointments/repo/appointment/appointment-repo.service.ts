@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThan, MoreThan, Not, Repository } from 'typeorm';
+import { FindOptionsWhere, LessThan, MoreThan, Not, Repository } from 'typeorm';
 import { Appointment } from '../../entities/appointment.entity';
 import { AppointmentStatus } from '../../enums/appointment-status.enum';
 
@@ -33,5 +33,13 @@ export class AppointmentRepoService {
       },
     });
     return overlappingAppointment === null;
+  }
+
+  async findAppointments(
+    where: FindOptionsWhere<Appointment>,
+    take: number,
+    skip: number,
+  ): Promise<Appointment[]> {
+    return this.appointmentRepository.find({ where, take, skip });
   }
 }

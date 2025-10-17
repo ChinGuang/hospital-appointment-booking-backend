@@ -1,6 +1,7 @@
 import { BaseResponseZodType } from 'src/common/interface';
 import { z } from 'zod';
 import { ZodUtils } from '../../common/utils/zod';
+import { AppointmentZodType } from './base-appointment.dto';
 
 export const CreateAppointmentStaffReqZodType = z.object({
   patientId: z.number(),
@@ -41,14 +42,7 @@ export type CreateAppointmentPatientReq = z.infer<
 >;
 
 export const CreateAppointmentPatientResZodType = BaseResponseZodType.extend({
-  data: z.object({
-    id: z.number(),
-    patientId: z.number(),
-    doctorId: z.number(),
-    appointmentDate: z.iso.date(),
-    startTime: ZodUtils.TimeZodType,
-    endTime: ZodUtils.TimeZodType,
-  }),
+  data: AppointmentZodType,
 });
 
 export type CreateAppointmentPatientRes = z.infer<

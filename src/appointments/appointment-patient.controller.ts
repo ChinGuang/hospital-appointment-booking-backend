@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
+  Query,
   Req,
   UseGuards,
   UsePipes,
@@ -15,6 +17,11 @@ import {
   CreateAppointmentPatientRes,
   type CreateAppointmentPatientReq,
 } from './dto/create-appointment.dto';
+import {
+  GetAppointmentsPatientReqZodType,
+  GetAppointmentsPatientRes,
+  type GetAppointmentsPatientReq,
+} from './dto/get-appointment.dto';
 
 @Controller('appointments/patient')
 export class AppointmentPatientController {
@@ -32,5 +39,16 @@ export class AppointmentPatientController {
       body,
       patientId,
     );
+  }
+
+  @Get()
+  @UseGuards(AuthUserGuard)
+  async getAppointments(
+    @Req() req: Request & { user: User },
+    @Query(new ZodValidationPipe(GetAppointmentsPatientReqZodType))
+    query: GetAppointmentsPatientReq,
+  ): Promise<GetAppointmentsPatientRes> {
+    const patientId = req.user.id;
+    return this.appointmentService.getAppointmentsFromPatient(query, patientId);
   }
 }
