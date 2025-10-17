@@ -14,11 +14,11 @@ export class Appointment {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Doctor, { eager: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => Doctor, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'doctorId', referencedColumnName: 'id' })
   doctor: Doctor;
 
-  @ManyToOne(() => User, { eager: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'patientId', referencedColumnName: 'id' })
   patient: User;
 

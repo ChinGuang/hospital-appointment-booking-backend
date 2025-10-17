@@ -3,7 +3,14 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Between, FindOptionsWhere, In, LessThan, MoreThan } from 'typeorm';
+import {
+  Between,
+  DataSource,
+  FindOptionsWhere,
+  In,
+  LessThan,
+  MoreThan,
+} from 'typeorm';
 import { DoctorRepoService } from '../doctors/repo/doctor/doctor-repo.service';
 import { UserService } from '../users/user.service';
 import { CancelAppointmentRes } from './dto/cancel-appointment.dto';
@@ -29,10 +36,12 @@ export class AppointmentService {
     private readonly appointmentRepoService: AppointmentRepoService,
     private readonly userService: UserService,
     private readonly doctorRepoService: DoctorRepoService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async createAppointmentFromStaff(
     createAppointmentStaffReq: CreateAppointmentStaffReq,
+    hospitalId: number,
   ): Promise<CreateAppointmentStaffRes> {
     const patient = await this.userService.getUserById(
       createAppointmentStaffReq.patientId,
@@ -43,28 +52,22 @@ export class AppointmentService {
     const doctor = await this.doctorRepoService.findById(
       createAppointmentStaffReq.doctorId,
     );
-    if (!doctor) {
+    if (!doctor || doctor.hospital.id !== hospitalId) {
       throw new NotFoundException('Doctor not found');
     }
     const appointmentDate = new Date(createAppointmentStaffReq.appointmentDate);
-    const isAvailable =
-      await this.appointmentRepoService.validateAvailableTimeSlot(
-        doctor.id,
-        appointmentDate,
-        createAppointmentStaffReq.startTime,
-        createAppointmentStaffReq.endTime,
+    const appointment =
+      await this.appointmentRepoService.createWithAvailabilityCheck(
+        {
+          appointmentDate,
+          startTime: createAppointmentStaffReq.startTime,
+          endTime: createAppointmentStaffReq.endTime,
+          doctor,
+          patient,
+          appointmentStatus: AppointmentStatus.SCHEDULED,
+        },
+        this.dataSource,
       );
-    if (!isAvailable) {
-      throw new ConflictException('Time slot is not available');
-    }
-    const appointment = await this.appointmentRepoService.create({
-      appointmentDate,
-      startTime: createAppointmentStaffReq.startTime,
-      endTime: createAppointmentStaffReq.endTime,
-      doctor,
-      patient,
-      appointmentStatus: AppointmentStatus.SCHEDULED,
-    });
     return {
       message: 'Appointment created successfully',
       data: {

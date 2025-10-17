@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { DoctorRepoService } from '../doctors/repo/doctor/doctor-repo.service';
 import {
@@ -48,7 +48,7 @@ export class AppointmentSlotsService {
   ): Promise<UpdateAppointmentSlotRes> {
     const doctor = await this.doctorRepoService.findById(doctorId);
     if (!doctor || doctor.hospital.id !== requestHospitalId) {
-      throw new Error('Doctor not found');
+      throw new NotFoundException('Doctor not found');
     }
     const appointmentSlots = await this.dataSource.transaction(
       async (manager) => {

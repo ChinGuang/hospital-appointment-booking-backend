@@ -1,10 +1,18 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOptionsWhere, LessThan, MoreThan, Not, Repository } from 'typeorm';
+import {
+  DataSource,
+  FindOptionsWhere,
+  LessThan,
+  MoreThan,
+  Not,
+  Repository,
+} from 'typeorm';
 import { Appointment } from '../../entities/appointment.entity';
 import { AppointmentStatus } from '../../enums/appointment-status.enum';
 
@@ -14,6 +22,28 @@ export class AppointmentRepoService {
     @InjectRepository(Appointment)
     private readonly appointmentRepository: Repository<Appointment>,
   ) {}
+
+  async createWithAvailabilityCheck(
+    appointment: Omit<Appointment, 'id' | 'createdAt'>,
+    dataSource: DataSource,
+  ): Promise<Appointment> {
+    return dataSource.transaction(async (manager) => {
+      const conflict = await manager.getRepository(Appointment).findOne({
+        where: {
+          doctor: { id: appointment.doctor.id },
+          appointmentDate: appointment.appointmentDate,
+          startTime: LessThan(appointment.endTime),
+          endTime: MoreThan(appointment.startTime),
+          appointmentStatus: Not(AppointmentStatus.CANCELLED),
+        },
+        lock: { mode: 'pessimistic_write' },
+      });
+      if (conflict) {
+        throw new ConflictException('Time slot is not available');
+      }
+      return manager.getRepository(Appointment).save(appointment);
+    });
+  }
 
   async create(
     appointment: Omit<Appointment, 'id' | 'createdAt'>,
@@ -44,7 +74,12 @@ export class AppointmentRepoService {
     take: number,
     skip: number,
   ): Promise<Appointment[]> {
-    return this.appointmentRepository.find({ where, take, skip });
+    return this.appointmentRepository.find({
+      where,
+      take,
+      skip,
+      relations: ['doctor', 'patient'],
+    });
   }
 
   async cancelAppointment(
@@ -59,6 +94,7 @@ export class AppointmentRepoService {
     }
     const appointment = await this.appointmentRepository.findOne({
       where: { id: appointmentId },
+      relations: ['doctor', 'patient'],
     });
     if (!appointment) {
       throw new NotFoundException('Appointment not found');
@@ -68,6 +104,9 @@ export class AppointmentRepoService {
     }
     if (from.hospitalId && appointment.doctor.hospital.id !== from.hospitalId) {
       throw new ForbiddenException('Access denied: Hospital only');
+    }
+    if (appointment.appointmentStatus === AppointmentStatus.CANCELLED) {
+      return appointment;
     }
     appointment.appointmentStatus = AppointmentStatus.CANCELLED;
     return this.appointmentRepository.save(appointment);

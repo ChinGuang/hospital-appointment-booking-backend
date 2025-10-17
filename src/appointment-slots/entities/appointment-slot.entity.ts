@@ -12,7 +12,7 @@ export class AppointmentSlot {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Doctor, { eager: true, onDelete: 'CASCADE' })
+  @ManyToOne(() => Doctor, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'doctorId', referencedColumnName: 'id' })
   doctor: Doctor;
 

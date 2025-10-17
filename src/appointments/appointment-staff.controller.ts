@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   Req,
@@ -36,8 +37,15 @@ export class AppointmentStaffController {
   @UseGuards(PermissionGuard)
   @UsePipes(new ZodValidationPipe(CreateAppointmentStaffReqZodType))
   @Post()
-  async createAppointment(@Body() body: CreateAppointmentStaffReq) {
-    return this.appointmentService.createAppointmentFromStaff(body);
+  async createAppointment(
+    @Req() req: Request & { staff?: Staff },
+    @Body() body: CreateAppointmentStaffReq,
+  ) {
+    if (!req.staff) {
+      throw new ForbiddenException('Access denied: Staff only');
+    }
+    const hospitalId = req.staff.hospital.id;
+    return this.appointmentService.createAppointmentFromStaff(body, hospitalId);
   }
 
   @Permissions([PermissionType.VIEW_APPOINTMENT])
@@ -62,7 +70,7 @@ export class AppointmentStaffController {
   @Permissions([PermissionType.CANCEL_APPOINTMENT])
   async cancelAppointment(
     @Req() req: Request & { user: Staff },
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<CancelAppointmentRes> {
     const hospitalId = req.user.hospital.id;
     return this.appointmentService.cancelAppointment(id, { hospitalId });

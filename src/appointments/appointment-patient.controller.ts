@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Query,
   Req,
@@ -59,7 +60,7 @@ export class AppointmentPatientController {
   @UseGuards(AuthUserGuard)
   async cancelAppointment(
     @Req() req: Request & { user: User },
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
   ): Promise<CancelAppointmentRes> {
     const patientId = req.user.id;
     return this.appointmentService.cancelAppointment(id, { patientId });
