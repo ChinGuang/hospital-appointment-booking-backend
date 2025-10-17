@@ -28,3 +28,29 @@ export const CreateAppointmentStaffResZodType = BaseResponseZodType.extend({
 export type CreateAppointmentStaffRes = z.infer<
   typeof CreateAppointmentStaffResZodType
 >;
+
+export const CreateAppointmentPatientReqZodType = z.object({
+  doctorId: z.number(),
+  appointmentDate: z.iso.date(),
+  startTime: ZodUtils.TimeZodType,
+  endTime: ZodUtils.TimeZodType,
+});
+
+export type CreateAppointmentPatientReq = z.infer<
+  typeof CreateAppointmentPatientReqZodType
+>;
+
+export const CreateAppointmentPatientResZodType = BaseResponseZodType.extend({
+  data: z.object({
+    id: z.number(),
+    patientId: z.number(),
+    doctorId: z.number(),
+    appointmentDate: z.iso.date(),
+    startTime: ZodUtils.TimeZodType,
+    endTime: ZodUtils.TimeZodType,
+  }),
+});
+
+export type CreateAppointmentPatientRes = z.infer<
+  typeof CreateAppointmentPatientResZodType
+>;
