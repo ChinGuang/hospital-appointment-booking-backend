@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { AppointmentSlotModule } from './appointment-slots/appointment-slots.module';
 import { AuthModule } from './auth/auth.module';
 import { DoctorModule } from './doctors/doctor.module';
 import { HospitalModule } from './hospitals/hospital.module';
@@ -28,6 +29,7 @@ import { StaffModule } from './staffs/staff.module';
     HospitalModule,
     StaffModule,
     DoctorModule,
+    AppointmentSlotModule,
   ],
 })
 export class AppModule {
