@@ -6,6 +6,7 @@ import {
 import { Between, FindOptionsWhere, In, LessThan, MoreThan } from 'typeorm';
 import { DoctorRepoService } from '../doctors/repo/doctor/doctor-repo.service';
 import { UserService } from '../users/user.service';
+import { CancelAppointmentRes } from './dto/cancel-appointment.dto';
 import {
   CreateAppointmentPatientReq,
   CreateAppointmentPatientRes,
@@ -223,6 +224,30 @@ export class AppointmentService {
         startTime: appointment.startTime,
         endTime: appointment.endTime,
       })),
+    };
+  }
+
+  async cancelAppointment(
+    appointmentId: number,
+    from: {
+      patientId?: number;
+      hospitalId?: number;
+    },
+  ): Promise<CancelAppointmentRes> {
+    const appointment = await this.appointmentRepoService.cancelAppointment(
+      appointmentId,
+      from,
+    );
+    return {
+      message: 'Appointment cancelled successfully',
+      data: {
+        id: appointment.id,
+        patientId: appointment.patient.id,
+        doctorId: appointment.doctor.id,
+        appointmentDate: appointment.appointmentDate.toISOString(),
+        startTime: appointment.startTime,
+        endTime: appointment.endTime,
+      },
     };
   }
 }

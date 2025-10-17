@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Query,
   Req,
@@ -12,6 +14,7 @@ import { AuthUserGuard } from '../common/guards/auth-user/auth-user.guard';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { User } from '../users/entities/user.entity';
 import { AppointmentService } from './appointment.service';
+import { CancelAppointmentRes } from './dto/cancel-appointment.dto';
 import {
   CreateAppointmentPatientReqZodType,
   CreateAppointmentPatientRes,
@@ -50,5 +53,15 @@ export class AppointmentPatientController {
   ): Promise<GetAppointmentsPatientRes> {
     const patientId = req.user.id;
     return this.appointmentService.getAppointmentsFromPatient(query, patientId);
+  }
+
+  @Delete(':id')
+  @UseGuards(AuthUserGuard)
+  async cancelAppointment(
+    @Req() req: Request & { user: User },
+    @Param('id') id: number,
+  ): Promise<CancelAppointmentRes> {
+    const patientId = req.user.id;
+    return this.appointmentService.cancelAppointment(id, { patientId });
   }
 }

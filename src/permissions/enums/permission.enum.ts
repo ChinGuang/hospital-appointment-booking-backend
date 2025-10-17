@@ -12,4 +12,5 @@ export enum PermissionType {
   DELETE_STAFF = 11,
   CREATE_APPOINTMENT = 12,
   VIEW_APPOINTMENT = 13,
+  CANCEL_APPOINTMENT = 14,
 }

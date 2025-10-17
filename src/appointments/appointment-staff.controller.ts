@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
+  Param,
   Post,
   Query,
   Req,
@@ -16,6 +18,7 @@ import { PermissionGuard } from '../common/guards/permission/permission.guard';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { PermissionType } from '../permissions/enums/permission.enum';
 import { AppointmentService } from './appointment.service';
+import { CancelAppointmentRes } from './dto/cancel-appointment.dto';
 import {
   CreateAppointmentStaffReqZodType,
   type CreateAppointmentStaffReq,
@@ -52,5 +55,16 @@ export class AppointmentStaffController {
       query,
       request.staff.hospital.id,
     );
+  }
+
+  @Delete(':id')
+  @UseGuards(PermissionGuard)
+  @Permissions([PermissionType.CANCEL_APPOINTMENT])
+  async cancelAppointment(
+    @Req() req: Request & { user: Staff },
+    @Param('id') id: number,
+  ): Promise<CancelAppointmentRes> {
+    const hospitalId = req.user.hospital.id;
+    return this.appointmentService.cancelAppointment(id, { hospitalId });
   }
 }
