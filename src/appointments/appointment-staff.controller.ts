@@ -1,13 +1,29 @@
-import { Body, Controller, Post, UseGuards, UsePipes } from '@nestjs/common';
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+  UsePipes,
+} from '@nestjs/common';
+import { Request } from 'express';
+import { Staff } from 'src/staffs/entities/staff.entity';
 import { Permissions } from '../common/guards/permission/permission.decorator';
 import { PermissionGuard } from '../common/guards/permission/permission.guard';
+import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { PermissionType } from '../permissions/enums/permission.enum';
 import { AppointmentService } from './appointment.service';
 import {
   CreateAppointmentStaffReqZodType,
   type CreateAppointmentStaffReq,
 } from './dto/create-appointment.dto';
+import {
+  GetAppointmentsStaffReqZodType,
+  type GetAppointmentsStaffReq,
+} from './dto/get-appointment.dto';
 
 @Controller('/appointments/staff')
 export class AppointmentStaffController {
@@ -19,5 +35,22 @@ export class AppointmentStaffController {
   @Post()
   async createAppointment(@Body() body: CreateAppointmentStaffReq) {
     return this.appointmentService.createAppointmentFromStaff(body);
+  }
+
+  @Permissions([PermissionType.VIEW_APPOINTMENT])
+  @UseGuards(PermissionGuard)
+  @Get()
+  async getAppointments(
+    @Req() request: Request & { staff?: Staff },
+    @Query(new ZodValidationPipe(GetAppointmentsStaffReqZodType))
+    query: GetAppointmentsStaffReq,
+  ) {
+    if (!request.staff) {
+      throw new ForbiddenException('Access denied: Staff only');
+    }
+    return this.appointmentService.getAppointmentsFromStaff(
+      query,
+      request.staff.hospital.id,
+    );
   }
 }
