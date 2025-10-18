@@ -13,7 +13,8 @@
         ],
         "eslint.format.enable": true,
         "editor.codeActionsOnSave": {
-            "source.fixAll.eslint": "always"
+            "source.fixAll.eslint": "always",
+            "source.organizeImports": "always"
         }
     }
 }
