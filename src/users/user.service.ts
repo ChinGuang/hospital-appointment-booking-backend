@@ -34,4 +34,8 @@ export class UserService {
   async getUser(...query: FindOptionsWhere<User>[]): Promise<User | null> {
     return this.userRepository.findOne({ where: query });
   }
+
+  async getUserById(id: number): Promise<User | null> {
+    return this.userRepository.findOne({ where: { id } });
+  }
 }
