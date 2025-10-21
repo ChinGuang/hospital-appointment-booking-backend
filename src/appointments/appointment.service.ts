@@ -11,6 +11,7 @@ import {
   LessThan,
   MoreThan,
 } from 'typeorm';
+import { EmailService } from '../common/services/email/email.service';
 import { DoctorRepoService } from '../doctors/repo/doctor/doctor-repo.service';
 import { UserService } from '../users/user.service';
 import { CancelAppointmentRes } from './dto/cancel-appointment.dto';
@@ -37,6 +38,7 @@ export class AppointmentService {
     private readonly userService: UserService,
     private readonly doctorRepoService: DoctorRepoService,
     private readonly dataSource: DataSource,
+    private readonly emailService: EmailService,
   ) {}
 
   async createAppointmentFromStaff(
@@ -68,6 +70,11 @@ export class AppointmentService {
         },
         this.dataSource,
       );
+    await this.emailService.sendMailWithoutTemplate({
+      to: patient.email,
+      subject: `Appointment Successful`,
+      text: `Appointment Successful`,
+    });
     return {
       message: 'Appointment created successfully',
       data: {
