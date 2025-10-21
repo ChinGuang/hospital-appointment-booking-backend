@@ -3,7 +3,6 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Address } from 'src/hospitals/repo/entities/hospital.entity';
 import {
   Between,
   DataSource,
@@ -14,6 +13,7 @@ import {
 } from 'typeorm';
 import { EmailService } from '../common/services/email/email.service';
 import { DoctorRepoService } from '../doctors/repo/doctor/doctor-repo.service';
+import { Address } from '../hospitals/repo/entities/hospital.entity';
 import { UserService } from '../users/user.service';
 import { CancelAppointmentRes } from './dto/cancel-appointment.dto';
 import {
@@ -71,10 +71,21 @@ export class AppointmentService {
         },
         this.dataSource,
       );
-    await this.emailService.sendMailWithoutTemplate({
-      to: patient.email,
-      subject: `Appointment Successful`,
-      text: `Appointment Successful`,
+    await this.sendSuccessAppointmentEmail({
+      patient: {
+        email: patient.email,
+        name: patient.username,
+      },
+      appointment: {
+        date: appointment.appointmentDate,
+      },
+      doctor: {
+        name: doctor.fullName,
+      },
+      hospital: {
+        address: doctor.hospital.address,
+        name: doctor.hospital.name,
+      },
     });
     return {
       message: 'Appointment created successfully',
