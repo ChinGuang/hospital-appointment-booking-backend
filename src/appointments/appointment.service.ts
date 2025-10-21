@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { Address } from 'src/hospitals/repo/entities/hospital.entity';
 import {
   Between,
   DataSource,
@@ -118,6 +119,22 @@ export class AppointmentService {
       doctor,
       patient,
       appointmentStatus: AppointmentStatus.SCHEDULED,
+    });
+    await this.sendSuccessAppointmentEmail({
+      patient: {
+        email: patient.email,
+        name: patient.username,
+      },
+      appointment: {
+        date: appointment.appointmentDate,
+      },
+      doctor: {
+        name: doctor.fullName,
+      },
+      hospital: {
+        address: doctor.hospital.address,
+        name: doctor.hospital.name,
+      },
     });
     return {
       message: 'Appointment created successfully',
@@ -259,5 +276,62 @@ export class AppointmentService {
         endTime: appointment.endTime,
       },
     };
+  }
+
+  async sendSuccessAppointmentEmail({
+    patient,
+    hospital,
+    appointment,
+    doctor,
+  }: {
+    patient: {
+      name: string;
+      email: string;
+    };
+    hospital: {
+      smtpSetting?: {
+        email: string;
+        appPassword: string;
+      };
+      name: string;
+      address: Omit<Address, 'id'>;
+    };
+    appointment: {
+      date: Date;
+    };
+    doctor: {
+      name: string;
+    };
+  }): Promise<void> {
+    await this.emailService.sendMailWithoutTemplate({
+      to: patient.email,
+      subject: `Appointment Confirmation - ${hospital.name}`,
+      text: `Dear ${patient.name},
+
+Thank you for booking your appointment with ${hospital.name}.
+We are pleased to confirm your appointment details as follows:
+
+Appointment Details:
+
+Date: ${appointment.date.toLocaleDateString()}
+
+Time: ${appointment.date.toLocaleTimeString(undefined, {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })}
+
+Doctor: ${doctor.name}
+
+Location: ${hospital.address.addressLine1.concat(hospital.address.addressLine2 ?? '')}
+
+Please arrive at least 15 minutes before your scheduled time for registration and preparation.
+If you need to reschedule or cancel, contact us at {{hospital_phone}} or {{hospital_email}} at least 24 hours in advance.
+
+We look forward to seeing you soon and providing you with the best care.
+
+Warm regards,
+${hospital.name}`,
+    });
   }
 }
