@@ -1,5 +1,4 @@
 import { MailerModule } from '@nestjs-modules/mailer';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EmailService } from './email.service';
@@ -8,16 +7,24 @@ import { EmailService } from './email.service';
   imports: [
     MailerModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
-        transport: configService.getOrThrow<string>('SMTP_URL'),
+        transport: {
+          host: configService.getOrThrow<string>('SMTP_HOST'),
+          port: +configService.getOrThrow<string>('SMTP_PORT'),
+          tls: {
+            rejectUnauthorized: false,
+          },
+          // For Test Environment
+          secure: false,
+
+          // For Production Environment
+          // secure: true,
+          // auth: {
+          //   user: configService.getOrThrow<string>('SMTP_USER'),
+          //   pass: configService.getOrThrow<string>('SMTP_APP_PASSWORD'),
+          // },
+        },
         defaults: {
           from: configService.getOrThrow<string>('DEFAULT_SENDER_EMAIL'),
-        },
-        template: {
-          dir: configService.get<string>('TEMPLATE_DIR'),
-          adapter: new HandlebarsAdapter(),
-          options: {
-            strict: true,
-          },
         },
       }),
       inject: [ConfigService],

@@ -6,21 +6,19 @@ export class EmailService {
   constructor(private readonly mailerService: MailerService) {}
 
   async sendMailWithoutTemplate({
-    from,
     to,
     subject,
     text,
   }: {
-    from?: string;
     to: string;
     subject: string;
     text: string;
   }) {
-    await this.mailerService.sendMail({
-      from,
+    const result = (await this.mailerService.sendMail({
       to,
       subject,
       text,
-    });
+    })) as unknown;
+    console.log(JSON.stringify(result));
   }
 }
