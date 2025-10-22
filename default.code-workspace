@@ -1,0 +1,22 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        // Auto fix ESLint issues (including unused imports if ESLint rule covers it)
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "always",
+            "source.organizeImports": "always"
+        },
+        "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+        // Ensure it runs ESLint on save
+        "eslint.validate": [
+            "typescript",
+            "javascript"
+        ],
+        // Optional: use Prettier if you use it
+        "editor.formatOnSave": true
+    }
+}
