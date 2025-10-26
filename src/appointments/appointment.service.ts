@@ -88,7 +88,7 @@ export class AppointmentService {
         },
         hospital: {
           name: hospital.name,
-          address: `${hospital.address.addressLine1} ${hospital.address.addressLine2 ?? ''},`,
+          address: `${hospital.address.addressLine1}${hospital.address.addressLine2 ? ' ' + hospital.address.addressLine2 : ''},`,
           smtpSetting: {
             email: smtpSetting?.emailFrom,
             appPassword: smtpSetting?.appPassword,
@@ -162,7 +162,7 @@ export class AppointmentService {
         },
         hospital: {
           name: hospital.name,
-          address: `${hospital.address.addressLine1} ${hospital.address.addressLine2 ?? ''},`,
+          address: `${hospital.address.addressLine1}${hospital.address.addressLine2 ? ' ' + hospital.address.addressLine2 : ''},`,
           smtpSetting: {
             email: smtpSetting?.emailFrom,
             appPassword: smtpSetting?.appPassword,
