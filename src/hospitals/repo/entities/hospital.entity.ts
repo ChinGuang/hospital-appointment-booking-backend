@@ -57,4 +57,7 @@ export class HospitalSmtpSetting {
 
   @Column({ nullable: true })
   emailFrom?: string;
+
+  @Column({ nullable: true })
+  appPassword?: string;
 }

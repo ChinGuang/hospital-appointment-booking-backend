@@ -1,15 +1,15 @@
 // @ts-check
 import eslint from '@eslint/js';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
+import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
-import { defineConfig } from 'eslint/config';
 
 export default defineConfig(
   {
     ignores: [
-      'eslint.config.mjs', 
-      '**/*.test.*',     
+      'eslint.config.mjs',
+      '**/*.test.*',
       '**/*.spec.*',],
   },
   eslint.configs.recommended,
@@ -33,7 +33,9 @@ export default defineConfig(
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
-      "@typescript-eslint/unbound-method": 'warn'
+      "@typescript-eslint/unbound-method": 'warn',
+      'object-curly-spacing': ['error', 'always'],
+      'block-spacing': ['error', 'never']
     },
   },
 );

@@ -11,7 +11,9 @@ import {
   LessThan,
   MoreThan,
 } from 'typeorm';
+import { EmailService } from '../common/services/email/email.service';
 import { DoctorRepoService } from '../doctors/repo/doctor/doctor-repo.service';
+import { HospitalSmtpSettingRepoService } from '../hospitals/repo/hospital-smtp-setting/hospital-smtp-setting-repo.service';
 import { UserService } from '../users/user.service';
 import { CancelAppointmentRes } from './dto/cancel-appointment.dto';
 import {
@@ -36,6 +38,8 @@ export class AppointmentService {
     private readonly appointmentRepoService: AppointmentRepoService,
     private readonly userService: UserService,
     private readonly doctorRepoService: DoctorRepoService,
+    private readonly emailService: EmailService,
+    private readonly hospitalSmtpSettingService: HospitalSmtpSettingRepoService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -68,6 +72,36 @@ export class AppointmentService {
         },
         this.dataSource,
       );
+    const hospital = appointment.doctor.hospital;
+    const smtpSetting = await this.hospitalSmtpSettingService.findByHospitalId(
+      hospital.id,
+    );
+    try {
+      await this.sendEmail({
+        appointment: {
+          date: appointment.appointmentDate,
+          startTime: appointment.startTime,
+          endTime: appointment.endTime,
+        },
+        doctor: {
+          name: appointment.doctor.fullName,
+        },
+        hospital: {
+          name: hospital.name,
+          address: `${hospital.address.addressLine1}${hospital.address.addressLine2 ? ' ' + hospital.address.addressLine2 : ''},`,
+          smtpSetting: {
+            email: smtpSetting?.emailFrom,
+            appPassword: smtpSetting?.appPassword,
+          },
+        },
+        patient: {
+          email: patient.email,
+          name: patient.username,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to send appointment confirmation email:', error);
+    }
     return {
       message: 'Appointment created successfully',
       data: {
@@ -112,6 +146,36 @@ export class AppointmentService {
       patient,
       appointmentStatus: AppointmentStatus.SCHEDULED,
     });
+    const hospital = appointment.doctor.hospital;
+    const smtpSetting = await this.hospitalSmtpSettingService.findByHospitalId(
+      hospital.id,
+    );
+    try {
+      await this.sendEmail({
+        appointment: {
+          date: appointment.appointmentDate,
+          startTime: appointment.startTime,
+          endTime: appointment.endTime,
+        },
+        doctor: {
+          name: appointment.doctor.fullName,
+        },
+        hospital: {
+          name: hospital.name,
+          address: `${hospital.address.addressLine1}${hospital.address.addressLine2 ? ' ' + hospital.address.addressLine2 : ''},`,
+          smtpSetting: {
+            email: smtpSetting?.emailFrom,
+            appPassword: smtpSetting?.appPassword,
+          },
+        },
+        patient: {
+          email: patient.email,
+          name: patient.username,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to send appointment confirmation email:', error);
+    }
     return {
       message: 'Appointment created successfully',
       data: {
@@ -252,5 +316,61 @@ export class AppointmentService {
         endTime: appointment.endTime,
       },
     };
+  }
+
+  async sendEmail(payload: {
+    hospital: {
+      name: string;
+      smtpSetting: {
+        email?: string;
+        appPassword?: string;
+      };
+      address: string;
+    };
+    patient: {
+      name: string;
+      email: string;
+    };
+    appointment: {
+      date: Date;
+      startTime: string;
+      endTime: string;
+    };
+    doctor: {
+      name: string;
+    };
+  }): Promise<void> {
+    await this.emailService.sendEmail({
+      sender: {
+        email: payload.hospital.smtpSetting.email,
+        appPassword: payload.hospital.smtpSetting.appPassword,
+      },
+      mail: {
+        to: payload.patient.email,
+        subject: `Appointment Confirmation - ${payload.hospital.name}`,
+        text: `Dear ${payload.patient.name},
+
+Thank you for booking your appointment with ${payload.hospital.name}.
+We are pleased to confirm your appointment details as follows:
+
+Appointment Details:
+
+Date: ${payload.appointment.date.toLocaleDateString()}
+
+Time: ${payload.appointment.startTime} - ${payload.appointment.endTime}
+
+Doctor: ${payload.doctor.name}
+
+Location: ${payload.hospital.address}
+
+Please arrive at least 15 minutes before your scheduled time for registration and preparation.
+
+We look forward to seeing you soon and providing you with the best care.
+
+Warm regards,
+${payload.hospital.name}
+`,
+      },
+    });
   }
 }
