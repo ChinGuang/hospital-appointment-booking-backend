@@ -72,6 +72,36 @@ export class AppointmentService {
         },
         this.dataSource,
       );
+    const hospital = appointment.doctor.hospital;
+    const smtpSetting = await this.hospitalSmtpSettingService.findByHospitalId(
+      hospital.id,
+    );
+    try {
+      await this.sendEmail({
+        appointment: {
+          date: appointment.appointmentDate,
+          startTime: appointment.startTime,
+          endTime: appointment.endTime,
+        },
+        doctor: {
+          name: appointment.doctor.fullName,
+        },
+        hospital: {
+          name: hospital.name,
+          address: `${hospital.address.addressLine1} ${hospital.address.addressLine2 ?? ''},`,
+          smtpSetting: {
+            email: smtpSetting?.emailFrom,
+            appPassword: smtpSetting?.appPassword,
+          },
+        },
+        patient: {
+          email: patient.email,
+          name: patient.username,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to send appointment confirmation email:', error);
+    }
     return {
       message: 'Appointment created successfully',
       data: {
@@ -120,28 +150,32 @@ export class AppointmentService {
     const smtpSetting = await this.hospitalSmtpSettingService.findByHospitalId(
       hospital.id,
     );
-    await this.sendEmail({
-      appointment: {
-        date: appointment.appointmentDate,
-        startTime: appointment.startTime,
-        endTime: appointment.endTime,
-      },
-      doctor: {
-        name: appointment.doctor.fullName,
-      },
-      hospital: {
-        name: hospital.name,
-        address: `${hospital.address.addressLine1} ${hospital.address.addressLine2 ?? ''},`,
-        smtpSetting: {
-          email: smtpSetting?.emailFrom,
-          appPassword: smtpSetting?.appPassword,
+    try {
+      await this.sendEmail({
+        appointment: {
+          date: appointment.appointmentDate,
+          startTime: appointment.startTime,
+          endTime: appointment.endTime,
         },
-      },
-      patient: {
-        email: patient.email,
-        name: patient.username,
-      },
-    });
+        doctor: {
+          name: appointment.doctor.fullName,
+        },
+        hospital: {
+          name: hospital.name,
+          address: `${hospital.address.addressLine1} ${hospital.address.addressLine2 ?? ''},`,
+          smtpSetting: {
+            email: smtpSetting?.emailFrom,
+            appPassword: smtpSetting?.appPassword,
+          },
+        },
+        patient: {
+          email: patient.email,
+          name: patient.username,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to send appointment confirmation email:', error);
+    }
     return {
       message: 'Appointment created successfully',
       data: {
@@ -330,7 +364,6 @@ Doctor: ${payload.doctor.name}
 Location: ${payload.hospital.address}
 
 Please arrive at least 15 minutes before your scheduled time for registration and preparation.
-If you need to reschedule or cancel, contact us at {{hospital_phone}} or {{hospital_email}} at least 24 hours in advance.
 
 We look forward to seeing you soon and providing you with the best care.
 
