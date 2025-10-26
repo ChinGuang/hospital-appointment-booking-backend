@@ -1,0 +1,49 @@
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import nodemailer from 'nodemailer';
+
+@Injectable()
+export class EmailService {
+  constructor(private readonly configService: ConfigService) {
+    this.SMTP_HOST = this.configService.getOrThrow('SMTP_HOST');
+    this.SMTP_PORT = this.configService.getOrThrow('SMTP_PORT');
+    this.SMTP_SECURE =
+      `${this.configService.getOrThrow('SMTP_SECURE')}` == 'true';
+    this.SMTP_DEFAULT_EMAIL = this.configService.get('SMTP_USER');
+    this.SMTP_APP_PASSWORD = this.configService.get('SMTP_APP_PASSWORD');
+  }
+  private readonly SMTP_HOST: string;
+  private readonly SMTP_PORT: number;
+  private readonly SMTP_SECURE: boolean;
+  private readonly SMTP_DEFAULT_EMAIL: string | undefined;
+  private readonly SMTP_APP_PASSWORD: string | undefined;
+
+  async sendEmail(payload: {
+    sender: {
+      email?: string;
+      appPassword?: string;
+    };
+    mail: {
+      to: string;
+      subject: string;
+      text: string;
+    };
+  }): Promise<void> {
+    const transporter = nodemailer.createTransport({
+      host: this.SMTP_HOST,
+      port: this.SMTP_PORT,
+      secure: this.SMTP_SECURE,
+      auth: {
+        user: payload.sender.email ?? this.SMTP_DEFAULT_EMAIL,
+        pass: payload.sender.appPassword ?? this.SMTP_APP_PASSWORD,
+      },
+    });
+    const info = await transporter.sendMail({
+      to: payload.mail.to,
+      subject: payload.mail.subject,
+      text: payload.mail.text,
+    });
+
+    console.log(`Email Info: `, JSON.stringify(info));
+  }
+}

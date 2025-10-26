@@ -15,4 +15,15 @@ export class HospitalSmtpSettingRepoService {
   ): Promise<HospitalSmtpSetting> {
     return this.hospitalSmtpSettingRepository.save(hospitalSmtpSetting);
   }
+
+  async findByHospitalId(id: number): Promise<HospitalSmtpSetting | null> {
+    return this.hospitalSmtpSettingRepository.findOne({
+      where: {
+        hospital: {
+          id,
+        },
+      },
+      relations: ['hospital', 'hospital.address'],
+    });
+  }
 }
